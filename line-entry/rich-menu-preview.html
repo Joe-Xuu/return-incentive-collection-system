@@ -3,78 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=2500, initial-scale=1.0">
-<title>Rich Menu Preview (2500×1686)</title>
+<title>Rich Menu Preview (2500×843)</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
-    width: 2500px; height: 1686px;
+    width: 2500px; height: 843px;
     font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
     overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
   }
-  .menu {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    width: 100%; height: 100%;
-  }
-  .cell {
-    display: flex; flex-direction: column;
-    justify-content: center; align-items: center;
-    border: 2px solid #edf2f7;
-    font-size: 56px; font-weight: 900;
-  }
-  .cell-dash {
-    background: #f0fdf4;
-    color: #06C755;
-  }
-  .cell-borrow {
+  .card {
+    display: flex; align-items: center; gap: 60px;
+    padding: 60px 120px;
     background: #ffffff;
-    color: #111111;
+    border-radius: 64px;
+    border: 6px solid #06C755;
+    box-shadow: 0 20px 80px rgba(6,199,85,0.12);
   }
-  .cell-return {
-    background: #ffffff;
-    color: #111111;
+  .icon { font-size: 180px; line-height: 1; }
+  .text-group { display: flex; flex-direction: column; gap: 12px; }
+  .title {
+    font-size: 96px; font-weight: 900; color: #06C755;
+    letter-spacing: 0.03em;
   }
-  .cell-points {
-    background: #f7f9fa;
-    color: #111111;
+  .sub {
+    font-size: 44px; color: #666666; font-weight: 700;
+    letter-spacing: 0.04em;
   }
-  .cell-help {
-    background: #f7f9fa;
-    color: #111111;
-  }
-  .emoji { font-size: 140px; margin-bottom: 20px; }
-  .label { font-size: 64px; font-weight: 900; letter-spacing: 0.04em; }
-  .label-green { color: #06C755; }
-  .label-dark { color: #111111; }
-  .sub { font-size: 36px; color: #999; margin-top: 12px; }
 </style>
 </head>
 <body>
-<div class="menu">
-  <div class="cell cell-dash">
-    <span class="emoji">📋</span>
-    <span class="label label-green">Dashboard</span>
-  </div>
-  <div class="cell cell-borrow">
-    <span class="emoji">📦</span>
-    <span class="label label-dark">借りる</span>
-    <span class="sub">Borrow</span>
-  </div>
-  <div class="cell cell-return">
-    <span class="emoji">🔄</span>
-    <span class="label label-dark">返却</span>
-    <span class="sub">Return</span>
-  </div>
-  <div class="cell cell-points">
-    <span class="emoji">⭐</span>
-    <span class="label label-dark">ポイント</span>
-    <span class="sub">Points</span>
-  </div>
-  <div class="cell cell-help">
-    <span class="emoji">❓</span>
-    <span class="label label-dark">ヘルプ</span>
-    <span class="sub">Help</span>
+<div class="card">
+  <span class="icon">🔄</span>
+  <div class="text-group">
+    <span class="title">Re:Turn</span>
+    <span class="sub">Tap to open Dashboard</span>
   </div>
 </div>
 </body>
