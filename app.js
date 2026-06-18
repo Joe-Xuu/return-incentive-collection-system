@@ -80,6 +80,8 @@ function finishLoading() {
 async function fetchDashboardData(userId, userName) {
   const MOCK_DELAY = 1800;
 
+  // Wrap GAS call so it NEVER rejects — if it fails,
+  // we just wait for mockPromise to win the race instead.
   const gasPromise = fetch(GAS_ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -97,6 +99,12 @@ async function fetchDashboardData(userId, userName) {
       }
       console.log("[Re:Turn] ✓ Data from GAS endpoint");
       return json;
+    })
+    .catch((err) => {
+      // Swallow the error so Promise.race doesn't reject.
+      // mockPromise will resolve after MOCK_DELAY and win the race.
+      console.warn("[Re:Turn] GAS unreachable:", err.message);
+      return new Promise(() => {}); // hang forever, mock wins
     });
 
   const mockPromise = new Promise((resolve) => {
@@ -201,8 +209,8 @@ async function initApp() {
     // 5. Reveal
     finishLoading();
   } catch (err) {
-    // LIFF init failed — always fall back to demo mode
-    console.warn("[Re:Turn] LIFF init failed:", err.message || err);
+    // LIFF unavailable — fall back to offline demo
+    console.warn("[Re:Turn] Init failed:", err.message || err);
     runDemoMode();
   }
 }
