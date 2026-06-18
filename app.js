@@ -171,47 +171,69 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// --- Demo mode (LIFF unavailable) ------------------------
+// --- Render mock fallback (GAS unreachable) ---------------
 
-function runDemoMode() {
-  console.log("[Re:Turn] Running in demo mode");
+function renderWithMockData() {
   const data = MOCK_RESPONSE.data;
   renderProfile(data, null);
   renderBorrowing(data.borrowedItems);
-  userIdEl.textContent = "ID: demo-mode";
+  userIdEl.textContent = "ID: —";
   finishLoading();
-  showToast("Demo mode — not inside LINE.");
 }
 
 // --- Init Flow -------------------------------------------
 
 async function initApp() {
+  let liffProfile = null;
+  let userId = null;
+  let displayName = "";
+
+  // Step 1 — LIFF init
   try {
-    // 1. Initialize LIFF
     await liff.init({ liffId: LIFF_ID });
     console.log("[Re:Turn] LIFF initialized ✓");
+  } catch (err) {
+    console.warn("[Re:Turn] LIFF init failed:", err.message || err);
+    renderWithMockData();
+    showToast("LIFF init failed. Are you inside LINE?");
+    return;
+  }
 
-    // 2. Get LIFF profile
-    const liffProfile = await liff.getProfile();
-    const userId = liffProfile.userId;
-    const displayName = liffProfile.displayName || "";
+  // Step 2 — get LIFF profile
+  try {
+    liffProfile = await liff.getProfile();
+    userId = liffProfile.userId;
+    displayName = liffProfile.displayName || "";
     console.log("[Re:Turn] userId:", userId);
     userIdEl.textContent = `ID: ${userId.slice(0, 12)}…`;
+  } catch (err) {
+    console.warn("[Re:Turn] getProfile failed:", err.message || err);
+    renderWithMockData();
+    showToast("Profile error: " + (err.message || err));
+    return;
+  }
 
-    // 3. Fetch dashboard data (GAS or mock fallback)
-    const response = await fetchDashboardData(userId, displayName);
+  // Step 3 — fetch dashboard (GAS or mock)
+  let response;
+  try {
+    response = await fetchDashboardData(userId, displayName);
+  } catch (err) {
+    console.warn("[Re:Turn] fetchDashboardData threw:", err.message || err);
+    renderWithMockData();
+    showToast("Data error: " + (err.message || err));
+    return;
+  }
+
+  // Step 4 — render
+  try {
     const data = response.data;
-
-    // 4. Render
     renderProfile(data, liffProfile);
     renderBorrowing(data.borrowedItems);
-
-    // 5. Reveal
     finishLoading();
   } catch (err) {
-    // LIFF unavailable — fall back to offline demo
-    console.warn("[Re:Turn] Init failed:", err.message || err);
-    runDemoMode();
+    console.warn("[Re:Turn] Render failed:", err.message || err);
+    renderWithMockData();
+    showToast("Render error: " + (err.message || err));
   }
 }
 
