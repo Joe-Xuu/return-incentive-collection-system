@@ -73,48 +73,48 @@ function finishLoading() {
 
 /**
  * Fetch dashboard data for a given userId.
- * Sends `action: "getDashboard"` to the GAS doPost router.
- * Races the real GAS endpoint against a mock-data timeout
- * so the UI still works if GAS isn't deployed yet.
+ * Tries GAS first; falls back to mock data immediately on any failure.
  */
 async function fetchDashboardData(userId, userName) {
-  const MOCK_DELAY = 1800;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
 
-  // Wrap GAS call so it NEVER rejects — if it fails,
-  // we just wait for mockPromise to win the race instead.
-  const gasPromise = fetch(GAS_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "getDashboard",
-      userId: userId,
-      userName: userName || "ECO PLAYER",
-    }),
-  })
-    .then(async (res) => {
-      if (!res.ok) throw new Error(`GAS responded with ${res.status}`);
-      const json = await res.json();
-      if (json.status !== "success") {
-        throw new Error(json.message || "GAS returned non-success");
-      }
-      console.log("[Re:Turn] ✓ Data from GAS endpoint");
-      return json;
-    })
-    .catch((err) => {
-      // Swallow the error so Promise.race doesn't reject.
-      // mockPromise will resolve after MOCK_DELAY and win the race.
-      console.warn("[Re:Turn] GAS unreachable:", err.message);
-      return new Promise(() => {}); // hang forever, mock wins
+  try {
+    const res = await fetch(GAS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "getDashboard",
+        userId: userId,
+        userName: userName || "ECO PLAYER",
+      }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
-  const mockPromise = new Promise((resolve) => {
-    setTimeout(() => {
-      console.log("[Re:Turn] ⚠ GAS not ready — using mock data");
-      resolve(MOCK_RESPONSE);
-    }, MOCK_DELAY);
-  });
+    // Even on HTTP errors, try to read the body for a useful error message
+    const text = await res.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch {
+      throw new Error(
+        `GAS returned non-JSON (HTTP ${res.status}): ${text.slice(0, 120)}`
+      );
+    }
 
-  return Promise.race([gasPromise, mockPromise]);
+    if (!res.ok || json.status !== "success") {
+      throw new Error(json.message || `HTTP ${res.status}`);
+    }
+
+    console.log("[Re:Turn] ✓ Data from GAS endpoint");
+    return json;
+  } catch (err) {
+    clearTimeout(timeout);
+    console.warn("[Re:Turn] GAS failed, using mock:", err.message);
+    showToast("GAS: " + (err.message || err));
+    return MOCK_RESPONSE;
+  }
 }
 
 // --- Rendering -------------------------------------------
