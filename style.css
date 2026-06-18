@@ -320,6 +320,89 @@ img {
   letter-spacing: 0.04em;
 }
 
+/* --- History Card --------------------------------------- */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel-bg);
+  border-radius: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-light);
+}
+
+.history-item-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.history-container-id {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.history-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.history-nfc-warn {
+  font-size: 0.68rem;
+  color: #e67e22;
+  font-weight: 600;
+  margin-top: 2px;
+  font-style: italic;
+}
+
+.history-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.badge-borrowed {
+  color: #05a045;
+  background: var(--light-green);
+  border: 1px solid var(--border-green);
+}
+
+.badge-returned {
+  color: #555;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
+.badge-error {
+  color: #c0392b;
+  background: #fdf2f2;
+  border: 1px solid #f5c6cb;
+}
+
+.history-empty {
+  text-align: center;
+  padding: 16px 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 /* --- Task Center Card ----------------------------------- */
 .task-card {
   border: 2px dashed var(--main-green);
