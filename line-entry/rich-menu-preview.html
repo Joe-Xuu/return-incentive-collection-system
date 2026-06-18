@@ -1,45 +1,195 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=2500, initial-scale=1.0">
-<title>Rich Menu Preview (2500×843)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rich Menu Generator — Re:Turn</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    width: 2500px; height: 843px;
     font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
-    overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 50%, #f0fdf4 100%);
+    background: #f7f9fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 32px;
+    padding: 24px;
   }
-  .card {
-    display: flex; align-items: center; gap: 60px;
-    padding: 60px 120px;
-    background: #ffffff;
-    border-radius: 64px;
-    border: 6px solid #06C755;
-    box-shadow: 0 20px 80px rgba(6,199,85,0.12);
-  }
-  .icon { font-size: 180px; line-height: 1; }
-  .text-group { display: flex; flex-direction: column; gap: 12px; }
-  .title {
-    font-size: 96px; font-weight: 900; color: #06C755;
+
+  h1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #111;
     letter-spacing: 0.03em;
   }
-  .sub {
-    font-size: 44px; color: #666666; font-weight: 700;
+
+  /* Preview at screen-friendly size */
+  .preview-wrapper {
+    width: 100%;
+    max-width: 720px;
+    aspect-ratio: 2500 / 843;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    border: 1px solid #edf2f7;
+  }
+
+  .preview-wrapper canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .btn-download {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
     letter-spacing: 0.04em;
+    color: #fff;
+    background: #06C755;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(6,199,85,0.25);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+
+  .btn-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(6,199,85,0.35);
+  }
+
+  .btn-download:active {
+    transform: translateY(0);
+  }
+
+  .hint {
+    font-size: 0.8rem;
+    color: #999;
+    font-weight: 600;
+  }
+
+  /* Hidden full-res canvas (renders at 2500×843) */
+  #hi-res {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
   }
 </style>
 </head>
 <body>
-<div class="card">
-  <span class="icon">🔄</span>
-  <div class="text-group">
-    <span class="title">Re:Turn</span>
-    <span class="sub">Tap to open Dashboard</span>
-  </div>
+
+<h1>Re:Turn — Rich Menu Image</h1>
+
+<div class="preview-wrapper">
+  <canvas id="preview"></canvas>
 </div>
+
+<canvas id="hi-res" width="2500" height="843"></canvas>
+
+<button class="btn-download" onclick="downloadPNG()">⬇ Download 2500×843 PNG</button>
+<span class="hint">Then upload to LINE Developers Console → Rich Menu</span>
+
+<script>
+const W = 2500;
+const H = 843;
+
+function draw(canvas) {
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width;
+  const h = canvas.height;
+  const scale = w / W; // scales all coordinates proportionally
+
+  // --- Background (matches app --bg-color) ---
+  ctx.fillStyle = '#f7f9fa';
+  ctx.fillRect(0, 0, w, h);
+
+  // --- Card dimensions (proportional to 2500×843) ---
+  const cardW = 2100 * scale;
+  const cardH = 560 * scale;
+  const cardX = (w - cardW) / 2;
+  const cardY = (h - cardH) / 2;
+  const cardR = 64 * scale;
+
+  // Card shadow
+  ctx.shadowColor = 'rgba(6,199,85,0.10)';
+  ctx.shadowBlur = 60 * scale;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 16 * scale;
+
+  // Card fill
+  ctx.fillStyle = '#ffffff';
+  roundRect(ctx, cardX, cardY, cardW, cardH, cardR);
+  ctx.fill();
+
+  // Reset shadow
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Card border
+  ctx.strokeStyle = '#06C755';
+  ctx.lineWidth = 5 * scale;
+  roundRect(ctx, cardX, cardY, cardW, cardH, cardR);
+  ctx.stroke();
+
+  // --- Content ---
+  const centerX = w / 2;
+  const centerY = h / 2;
+
+  // Emoji
+  ctx.font = `${140 * scale}px system-ui, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🔄', centerX, centerY - 75 * scale);
+
+  // Title
+  ctx.font = `900 ${84 * scale}px Montserrat, sans-serif`;
+  ctx.fillStyle = '#06C755';
+  ctx.fillText('Re:Turn', centerX, centerY + 40 * scale);
+
+  // Subtitle
+  ctx.font = `600 ${36 * scale}px Montserrat, 'Noto Sans JP', sans-serif`;
+  ctx.fillStyle = '#666666';
+  ctx.fillText('Tap to open Dashboard', centerX, centerY + 110 * scale);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// --- Draw preview (scaled to canvas element size) ---
+const preview = document.getElementById('preview');
+preview.width = W;
+preview.height = H;
+draw(preview);
+
+// --- Draw hi-res ---
+const hiRes = document.getElementById('hi-res');
+draw(hiRes);
+
+// --- Download ---
+function downloadPNG() {
+  const link = document.createElement('a');
+  link.download = 'return-rich-menu-2500x843.png';
+  link.href = hiRes.toDataURL('image/png');
+  link.click();
+}
+</script>
+
 </body>
 </html>
