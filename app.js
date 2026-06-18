@@ -65,15 +65,13 @@ function escapeHtml(str) {
 // --- Data Fetching ---------------------------------------
 
 async function fetchDashboardData(userId, userName) {
-  const res = await fetch(GAS_ENDPOINT, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "getDashboard",
-      userId: userId,
-      userName: userName || "ECO PLAYER",
-    }),
+  // Use GET to avoid CORS preflight (POST with JSON triggers OPTIONS)
+  const params = new URLSearchParams({
+    action: "getDashboard",
+    userId: userId,
+    userName: userName || "ECO PLAYER",
   });
+  const res = await fetch(GAS_ENDPOINT + "?" + params.toString());
 
   const text = await res.text();
 
