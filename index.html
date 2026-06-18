@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Re:Turn — Dashboard</title>
+
+  <!-- Google Fonts: Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- LINE LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+
+  <!-- ========== Loading Overlay ========== -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p class="loading-text">Loading Re:Turn...</p>
+  </div>
+
+  <!-- ========== Main App Shell ========== -->
+  <main id="app" class="hidden">
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <span class="brand-icon">🔄</span>
+        <h1 class="brand-title">Re:Turn</h1>
+      </div>
+      <span class="header-subtitle">Zero-Friction O2O</span>
+    </header>
+
+    <!-- Profile Card -->
+    <section class="card profile-card">
+      <div class="profile-top">
+        <div class="avatar-wrapper">
+          <img id="profile-pic" class="avatar" src="" alt="User avatar" />
+        </div>
+        <div class="profile-info">
+          <h2 id="user-name" class="user-name">—</h2>
+          <span id="user-id" class="user-id">—</span>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-score">0</span>
+          <span class="stat-label">Points</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-usage">0</span>
+          <span class="stat-label">Total Uses</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Borrowing Status Card -->
+    <section class="card borrow-card">
+      <div class="card-header">
+        <h3 class="card-title">📦 Current Borrowing</h3>
+      </div>
+      <div id="borrow-content">
+        <!-- Dynamically filled -->
+      </div>
+    </section>
+
+    <!-- Task Center: Intensive Collection (Placeholder) -->
+    <section class="card task-card">
+      <div class="card-header task-card-header">
+        <h3 class="card-title">🎯 Task Center: Intensive Collection</h3>
+        <span class="badge badge-coming-soon">Coming Soon</span>
+      </div>
+      <div class="task-placeholder">
+        <div class="placeholder-icon">🗺️</div>
+        <p class="placeholder-text">
+          Map view and lock-acquire logic<br />will be implemented here.
+        </p>
+      </div>
+    </section>
+
+    <!-- Error / Info Toast -->
+    <div id="error-toast" class="toast hidden">
+      <span id="error-message"></span>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
