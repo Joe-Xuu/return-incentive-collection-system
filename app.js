@@ -28,32 +28,10 @@ function formatTime(raw) {
     const d = new Date(raw.replace(" ", "T"));
     if (isNaN(d.getTime())) return raw;
     return d.toLocaleString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: "numeric", month: "short", day: "numeric",
+      hour: "2-digit", minute: "2-digit",
     });
-  } catch {
-    return raw;
-  }
-}
-
-function finishLoading() {
-  loadingOverlay.classList.add("hidden");
-  appShell.classList.remove("hidden");
-}
-
-/** Write error text directly into the borrow card so it's impossible to miss */
-function showErrorInCard(msg) {
-  borrowContent.innerHTML = `
-    <div style="
-      background:#fff5f5; border:2px solid #e53e3e; border-radius:14px;
-      padding:18px 16px; color:#c53030; font-weight:600; font-size:0.9rem;
-      word-break:break-all; line-height:1.6;
-    ">
-      ❌ ${escapeHtml(msg)}
-    </div>`;
+  } catch { return raw; }
 }
 
 function escapeHtml(str) {
@@ -62,32 +40,64 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+function finishLoading() {
+  loadingOverlay.classList.add("hidden");
+  appShell.classList.remove("hidden");
+}
+
+// --- Step-by-step progress log (shown in borrow card) ----
+
+let steps = [];
+
+function addStep(label, ok, detail) {
+  steps.push({ label, ok, detail });
+  const html = steps.map(s => {
+    const icon = s.ok === true ? "✅" : s.ok === false ? "❌" : "⏳";
+    const color = s.ok === true ? "#06C755" : s.ok === false ? "#e53e3e" : "#999";
+    const detailHtml = s.detail ? `<div style="font-size:0.75rem;color:#888;margin-top:2px;">${escapeHtml(s.detail)}</div>` : "";
+    return `<div style="padding:6px 0;color:${color};font-weight:600;font-size:0.9rem;">${icon} ${escapeHtml(s.label)}${detailHtml}</div>`;
+  }).join("");
+  borrowContent.innerHTML = `<div style="padding:4px 0;">${html}</div>`;
+}
+
 // --- Data Fetching ---------------------------------------
 
 async function fetchDashboardData(userId, userName) {
-  // Use GET to avoid CORS preflight (POST with JSON triggers OPTIONS)
-  const params = new URLSearchParams({
+  const url = GAS_ENDPOINT + "?" + new URLSearchParams({
     action: "getDashboard",
     userId: userId,
     userName: userName || "ECO PLAYER",
-  });
-  const res = await fetch(GAS_ENDPOINT + "?" + params.toString());
+  }).toString();
+
+  addStep("Fetching " + url.slice(0, 70) + "…", null);
+
+  let res;
+  try {
+    res = await fetch(url);
+    addStep("HTTP response: " + res.status + " " + res.statusText, res.ok);
+  } catch (err) {
+    addStep("Fetch failed", false, err.message || String(err));
+    throw err;
+  }
 
   const text = await res.text();
+  addStep("Response body (" + text.length + " bytes)", true, text.slice(0, 300));
 
   let json;
   try {
     json = JSON.parse(text);
+    addStep("JSON parsed", true, JSON.stringify(json).slice(0, 300));
   } catch {
-    throw new Error(
-      "GAS did not return JSON. HTTP " + res.status + ". Response: " + text.slice(0, 200)
-    );
+    addStep("JSON parse failed", false, "Not valid JSON. Raw: " + text.slice(0, 300));
+    throw new Error("GAS returned non-JSON (HTTP " + res.status + ")");
   }
 
   if (!res.ok || json.status !== "success") {
-    throw new Error(json.message || "HTTP " + res.status + " — " + JSON.stringify(json).slice(0, 200));
+    addStep("GAS status check", false, "status=" + json.status + " message=" + (json.message || "none"));
+    throw new Error(json.message || "HTTP " + res.status);
   }
 
+  addStep("GAS returned success", true, "userName=" + json.data.userName + " score=" + json.data.score + " items=" + json.data.borrowedItems.length);
   return json;
 }
 
@@ -116,25 +126,19 @@ function renderBorrowing(items) {
     borrowContent.innerHTML = `
       <div class="borrow-empty">
         <div class="borrow-empty-icon">✅</div>
-        <p class="borrow-empty-text">
-          All cleared! You have no unreturned containers.
-        </p>
+        <p class="borrow-empty-text">All cleared! You have no unreturned containers.</p>
       </div>`;
     return;
   }
 
-  const listHtml = items
-    .map(
-      (item) => `
+  const listHtml = items.map((item) => `
     <div class="borrow-item">
       <div class="borrow-item-left">
         <span class="borrow-container-id">${escapeHtml(item.containerId)}</span>
         <span class="borrow-time">${formatTime(item.borrowTime)}</span>
       </div>
       <span class="borrow-badge">Borrowing</span>
-    </div>`
-    )
-    .join("");
+    </div>`).join("");
 
   borrowContent.innerHTML = `<div class="borrow-list">${listHtml}</div>`;
 }
@@ -143,29 +147,45 @@ function renderBorrowing(items) {
 
 async function initApp() {
   // Step 1 — LIFF init
-  await liff.init({ liffId: LIFF_ID });
+  addStep("LIFF init…", null);
+  try {
+    await liff.init({ liffId: LIFF_ID });
+    addStep("LIFF init", true);
+  } catch (err) {
+    addStep("LIFF init", false, err.message || String(err));
+    throw err;
+  }
 
   // Step 2 — get profile
-  const liffProfile = await liff.getProfile();
-  const userId = liffProfile.userId;
-  const displayName = liffProfile.displayName || "";
-  userIdEl.textContent = `ID: ${userId.slice(0, 12)}…`;
+  addStep("getProfile()…", null);
+  let liffProfile, userId, displayName;
+  try {
+    liffProfile = await liff.getProfile();
+    userId = liffProfile.userId;
+    displayName = liffProfile.displayName || "";
+    addStep("getProfile()", true, "userId=" + userId.slice(0, 16) + "… displayName=" + displayName);
+    userIdEl.textContent = `ID: ${userId.slice(0, 12)}…`;
+  } catch (err) {
+    addStep("getProfile()", false, err.message || String(err));
+    throw err;
+  }
 
-  // Step 3 — fetch from GAS (no mock, no fallback)
+  // Step 3 — GAS fetch
   const response = await fetchDashboardData(userId, displayName);
 
   // Step 4 — render
+  addStep("Rendering…", null);
   renderProfile(response.data, liffProfile);
   renderBorrowing(response.data.borrowedItems);
+  addStep("Render complete", true);
+
   finishLoading();
 }
 
 // --- Boot ------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-  initApp().catch((err) => {
-    // Any uncaught error → show in card + unhide shell
-    console.error("[Re:Turn]", err.message || err);
+  initApp().catch(() => {
+    // Error already logged by addStep — just unhide shell
     finishLoading();
-    showErrorInCard(err.message || String(err));
   });
 });
