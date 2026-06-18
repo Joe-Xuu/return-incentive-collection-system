@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=2500, initial-scale=1.0">
+<title>Rich Menu Preview (2500×1686)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 2500px; height: 1686px;
+    font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+    overflow: hidden;
+  }
+  .menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    width: 100%; height: 100%;
+  }
+  .cell {
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    border: 2px solid #edf2f7;
+    font-size: 56px; font-weight: 900;
+  }
+  .cell-dash {
+    background: #f0fdf4;
+    color: #06C755;
+  }
+  .cell-borrow {
+    background: #ffffff;
+    color: #111111;
+  }
+  .cell-return {
+    background: #ffffff;
+    color: #111111;
+  }
+  .cell-points {
+    background: #f7f9fa;
+    color: #111111;
+  }
+  .cell-help {
+    background: #f7f9fa;
+    color: #111111;
+  }
+  .emoji { font-size: 140px; margin-bottom: 20px; }
+  .label { font-size: 64px; font-weight: 900; letter-spacing: 0.04em; }
+  .label-green { color: #06C755; }
+  .label-dark { color: #111111; }
+  .sub { font-size: 36px; color: #999; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="menu">
+  <div class="cell cell-dash">
+    <span class="emoji">📋</span>
+    <span class="label label-green">Dashboard</span>
+  </div>
+  <div class="cell cell-borrow">
+    <span class="emoji">📦</span>
+    <span class="label label-dark">借りる</span>
+    <span class="sub">Borrow</span>
+  </div>
+  <div class="cell cell-return">
+    <span class="emoji">🔄</span>
+    <span class="label label-dark">返却</span>
+    <span class="sub">Return</span>
+  </div>
+  <div class="cell cell-points">
+    <span class="emoji">⭐</span>
+    <span class="label label-dark">ポイント</span>
+    <span class="sub">Points</span>
+  </div>
+  <div class="cell cell-help">
+    <span class="emoji">❓</span>
+    <span class="label label-dark">ヘルプ</span>
+    <span class="sub">Help</span>
+  </div>
+</div>
+</body>
+</html>
