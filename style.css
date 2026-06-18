@@ -107,11 +107,12 @@ img {
 }
 
 .brand-title {
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   font-weight: 900;
   color: var(--main-green);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
   font-family: 'Montserrat', sans-serif;
+  text-shadow: 0 6px 16px rgba(6, 199, 85, 0.15);
 }
 
 .header-subtitle {

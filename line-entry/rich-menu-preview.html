@@ -141,11 +141,17 @@ function draw(canvas) {
   const centerX = w / 2;
   const centerY = h / 2;
 
-  // Title (matches app .brand-title: Montserrat 900, #06C755)
-  ctx.font = `900 ${84 * scale}px Montserrat, sans-serif`;
-  ctx.fillStyle = '#06C755';
+  // Title (matches app .brand-title: Montserrat 900, wide spacing, shadow)
+  const titleFontSize = 96 * scale;
+  ctx.font = `900 ${titleFontSize}px Montserrat, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+
+  // Text shadow for depth
+  ctx.fillStyle = 'rgba(6,199,85,0.12)';
+  ctx.fillText('Re:Turn', centerX + 2 * scale, centerY - 18 * scale);
+
+  ctx.fillStyle = '#06C755';
   ctx.fillText('Re:Turn', centerX, centerY - 20 * scale);
 
   // Subtitle
