@@ -141,21 +141,17 @@ function draw(canvas) {
   const centerX = w / 2;
   const centerY = h / 2;
 
-  // Emoji
-  ctx.font = `${140 * scale}px system-ui, sans-serif`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('🔄', centerX, centerY - 75 * scale);
-
-  // Title
+  // Title (matches app .brand-title: Montserrat 900, #06C755)
   ctx.font = `900 ${84 * scale}px Montserrat, sans-serif`;
   ctx.fillStyle = '#06C755';
-  ctx.fillText('Re:Turn', centerX, centerY + 40 * scale);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Re:Turn', centerX, centerY - 20 * scale);
 
   // Subtitle
   ctx.font = `600 ${36 * scale}px Montserrat, 'Noto Sans JP', sans-serif`;
   ctx.fillStyle = '#666666';
-  ctx.fillText('Tap to open Dashboard', centerX, centerY + 110 * scale);
+  ctx.fillText('Tap to open Dashboard', centerX, centerY + 60 * scale);
 }
 
 function roundRect(ctx, x, y, w, h, r) {
