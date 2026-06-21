@@ -18,7 +18,6 @@ const userIdEl = $("#user-id");
 const statScore = $("#stat-score");
 const statUsage = $("#stat-usage");
 const borrowContent = $("#borrow-content");
-const historyContent = $("#history-content");
 
 // --- Helpers ---------------------------------------------
 
@@ -81,7 +80,8 @@ function renderProfile(data, liffProfile) {
   };
 
   userNameEl.textContent = data.userName;
-  statScore.textContent = data.score.toLocaleString();
+  const points = (data.usageCount || 0) * 10;
+  statScore.textContent = points.toLocaleString();
   statUsage.textContent = data.usageCount;
 }
 
@@ -107,45 +107,6 @@ function renderBorrowing(items) {
   borrowContent.innerHTML = `<div class="borrow-list">${listHtml}</div>`;
 }
 
-function renderHistory(transactions) {
-  if (!transactions || transactions.length === 0) {
-    historyContent.innerHTML = `<div class="history-empty">No transactions yet.</div>`;
-    return;
-  }
-
-  const listHtml = transactions.map((tx) => {
-    let badgeHtml = "";
-    let warnHtml = "";
-
-    if (tx.status === "BORROWED") {
-      badgeHtml = `<span class="history-badge badge-borrowed">Borrowing</span>`;
-    } else if (tx.status === "RETURNED") {
-      badgeHtml = `<span class="history-badge badge-returned">Returned</span>`;
-    } else if (tx.status === "ERROR_CLOSED" || tx.status === "ERROR_RETURN") {
-      badgeHtml = `<span class="history-badge badge-error">NFC Miss</span>`;
-      warnHtml = `<div class="history-nfc-warn">⚠ The NFC scan may have failed. Please hold the container longer next time.</div>`;
-    } else {
-      badgeHtml = `<span class="history-badge badge-returned">${escapeHtml(tx.status)}</span>`;
-    }
-
-    const timeInfo = tx.returnTime
-      ? `Borrowed: ${formatTime(tx.borrowTime)}  ·  Returned: ${formatTime(tx.returnTime)}`
-      : `Borrowed: ${formatTime(tx.borrowTime)}`;
-
-    return `
-    <div class="history-item">
-      <div class="history-item-left">
-        <span class="history-container-id">${escapeHtml(tx.containerId)}</span>
-        <span class="history-time">${timeInfo}</span>
-        ${warnHtml}
-      </div>
-      ${badgeHtml}
-    </div>`;
-  }).join("");
-
-  historyContent.innerHTML = `<div class="history-list">${listHtml}</div>`;
-}
-
 // --- Init Flow -------------------------------------------
 
 async function initApp() {
@@ -161,7 +122,6 @@ async function initApp() {
 
   renderProfile(data, liffProfile);
   renderBorrowing(data.borrowedItems);
-  renderHistory(data.recentTransactions);
   finishLoading();
 }
 
