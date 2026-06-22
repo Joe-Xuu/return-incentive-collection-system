@@ -1,5 +1,11 @@
 # Re:Turn — O2O Container Borrowing System
 
+<div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+  <a href="README.md"><button style="padding:8px 16px; border:2px solid #06C755; background:#06C755; color:#fff; border-radius:6px; font-weight:700; font-family:Montserrat,sans-serif; cursor:pointer; font-size:13px;">🇬🇧 EN</button></a>
+  <a href="README.ja.md"><button style="padding:8px 16px; border:2px solid #06C755; background:#fff; color:#06C755; border-radius:6px; font-weight:700; font-family:Montserrat,sans-serif; cursor:pointer; font-size:13px;">🇯🇵 日本語</button></a>
+  <a href="README.zh.md"><button style="padding:8px 16px; border:2px solid #06C755; background:#fff; color:#06C755; border-radius:6px; font-weight:700; font-family:Montserrat,sans-serif; cursor:pointer; font-size:13px;">🇨🇳 中文</button></a>
+</div>
+
 Zero-friction circular container borrowing & incentive system.
 Users borrow containers via LINE LIFF, return via NFC + Raspberry Pi, earn points tracked on Google Sheets.
 
