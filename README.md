@@ -12,12 +12,16 @@ Users borrow containers via LINE LIFF, return via NFC + Raspberry Pi, earn point
 │                           Re:Turn System                                │
 │                                                                         │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────────────────┐  │
-│  │   LINE App    │    │  NFC + Raspi │    │   Raspi Dashboard        │  │
-│  │  (User Phone) │    │  (Return Stn)│    │   (Public Leaderboard)   │  │
-│  └──────┬───────┘    └──────┬───────┘    └────────────┬─────────────┘  │
-│         │                   │                         │                 │
-│         │  LIFF SDK v2      │  HTTP POST              │  HTTP GET       │
-│         ▼                   ▼                         ▼                 │
+│  │   LINE App    │    │  NFC + Raspi │    │   Raspi Display           │  │
+│  │  (User Phone) │    │  (Borrow/Ret)│    │   (Leaderboard + CO2)     │  │
+│  │               │    │              │    │                           │  │
+│  │ Borrow LIFF ──┼────┤ NFC tag scan │    │ Flask SSE ← return_core   │  │
+│  │ Dashboard ────┼──┐ │ return POST  │    │ UI polls GAS getStats     │  │
+│  └───────────────┘  │ └──────┬───────┘    └────────────┬─────────────┘  │
+│                     │        │                         │                 │
+│                     │ LIFF   │ HTTP POST               │ HTTP GET        │
+│                     │ SDK v2 │                         │                 │
+│                     ▼        ▼                         ▼                 │
 │  ┌──────────────────────────────────────────────────────────────────┐  │
 │  │                   Google Apps Script (GAS)                        │  │
 │  │  ┌─────────────┐  ┌──────────────┐  ┌────────────────────────┐   │  │
@@ -60,18 +64,59 @@ LEADERBOARD: Raspi display → GAS doGet(getStats)   → Sheets(Users)     → R
 
 ## Component Index
 
-### 1. LINE LIFF Frontend (User Dashboard)
+### 1a. Borrow LIFF (Student Borrow Screen)
 
-| What | Where | Description |
-|------|-------|-------------|
-| App Shell | [`index.html`](index.html) | LIFF webview: Profile Card + Current Borrowing + Task Center placeholder |
-| Styles | [`style.css`](style.css) | Light/fresh theme, LINE Green (#06C755), Montserrat font, mobile-first |
-| App Logic | [`app.js`](app.js) | LIFF init, GAS data fetch, profile/borrowing render, points = usageCount × 10 |
-| Rich Menu Generator | [`line-entry/rich-menu-preview.html`](line-entry/rich-menu-preview.html) | Canvas-based 2500×843 PNG generator, one-click download |
-| Rich Menu Config | [`line-entry/rich-menu-config.json`](line-entry/rich-menu-config.json) | Single full-width button tap area |
+Appears when a student taps their NFC tag to borrow a container. QR-coded container ID is passed via URL param.
 
-**Deploy:** GitHub Pages → `https://liff.line.me/2008626930-pLAvndnp`
+**Repo:** [`Joe-Xuu/return-liff-frontend`](https://github.com/Joe-Xuu/return-liff-frontend)  
+**LIFF ID:** `2008626930-AddPwDy7`
+
+```
+return-liff-frontend/
+├── index.html         # Full app (inline CSS + JS): splash → borrow → success + leaderboard
+├── nfc-simulator.html # Dev tool: simulates NFC tap for testing GAS return endpoint
+├── sfc_logo.png       # Keio SFC logo
+└── megloo_logo.png    # Megloo project logo
+```
+
+| Feature | Detail |
+|--------|--------|
+| Entry | QR code with `?id=C-001` parameter |
+| Splash | Green fullscreen "Re:Turn" + welcome message, 1.8s fade-out |
+| Borrow View | Container ID display + "はい" button |
+| GAS Call | `POST borrow` with `userId` + `containerId` |
+| Success View | CO2 counter animation (94g/container), eco metaphor text |
+| Leaderboard | Dark card with slam-in animation + confetti + shake effect |
+| Name Edit | 8-char uppercase modal, saves to localStorage + GAS `updateName` |
+| LIFF Auth | Full LIFF init → ID token → login flow; localhost bypass for dev |
+
+**Flow:** `QR scan → LIFF opens → splash fades → student sees container ID → taps "はい" → GAS borrow → confetti + leaderboard slam-in`
+
+### 1b. Dashboard LIFF (User Status Dashboard)
+
+Check-your-status dashboard: profile, points, current borrowing. Opened via LINE Rich Menu.
+
+**Repo:** [`Joe-Xuu/return-incentive-collection-system`](https://github.com/Joe-Xuu/return-incentive-collection-system) ← THIS REPO  
 **LIFF ID:** `2008626930-pLAvndnp`
+
+```
+return-incentive-collection-system/
+├── index.html                     # App shell: Profile + Current Borrowing + Task Center
+├── style.css                      # Light/fresh theme, CSS variables, mobile-first
+├── app.js                         # LIFF init, GAS fetch, render logic, points = usageCount × 10
+└── line-entry/
+    ├── rich-menu-preview.html     # Canvas PNG generator for Rich Menu (2500×843)
+    └── rich-menu-config.json      # Single full-width button tap area
+```
+
+| Feature | Detail |
+|--------|--------|
+| Entry | LINE Rich Menu button → LIFF URL |
+| Profile Card | Avatar + display name + masked user ID |
+| Stats | Points (= usageCount × 10) + Total Uses |
+| Current Borrowing | List of unreturned containers with borrow time, or "All cleared!" |
+| Task Center | Placeholder: "Intensive Collection" map/lock-acquire (coming soon) |
+| GAS Call | `GET getDashboard` with `userId` + `userName` |
 
 ### 2. GAS Backend (API Server)
 
@@ -228,8 +273,20 @@ Response: { status: "success", action: "updateName" }
 
 ## Repo Map
 
+### All Repositories
+
+| Repo | What | GitHub |
+|------|------|--------|
+| **Dashboard LIFF** | User status dashboard (Profile + Borrowing) | `Joe-Xuu/return-incentive-collection-system` ← THIS REPO |
+| **Borrow LIFF** | Student borrow screen (NFC → borrow → leaderboard) | `Joe-Xuu/return-liff-frontend` |
+| **Raspi Station** | NFC daemon + Flask SSE + leaderboard display | `Joe-Xuu/return-system` (private) |
+| **Landscape** | Architecture overview (this README) | `Joe-Xuu/return-system-landscape` |
+| **GAS Backend** | Google Apps Script API server | GAS Editor (code in [GAS Code Reference](#gas-code-reference)) |
+
+### This Repo Structure
+
 ```
-incentive-collect-system/          ← THIS REPO (LIFF Frontend)
+incentive-collect-system/          ← Dashboard LIFF
 ├── index.html                     # App shell + all UI cards
 ├── style.css                      # Full stylesheet (CSS variables, cards, typography)
 ├── app.js                         # LIFF init, GAS fetch, render logic
@@ -239,13 +296,11 @@ incentive-collect-system/          ← THIS REPO (LIFF Frontend)
     └── rich-menu-config.json      # Tap area bounds
 ```
 
-### Code NOT in this repo (deployed elsewhere)
+### Code NOT in any repo (deployed elsewhere)
 
-| Code | Location | Path |
-|------|----------|------|
-| GAS Backend (doPost, doGet, all handlers) | Google Apps Script Editor | See [GAS Code Reference](#gas-code-reference) |
-| NFC Daemon + Flask Station | Raspberry Pi | `~/keio/2026/wadaken/raspi/return_system/` |
-| Raspi Station (private repo) | GitHub | `Joe-Xuu/return-system` |
+| Code | Location |
+|------|----------|
+| GAS Backend (doPost, doGet, all handlers) | Google Apps Script Editor |
 
 ---
 
@@ -602,9 +657,12 @@ function getDashboard(userId, userName) {
 
 | Link | Purpose |
 |------|---------|
+| LIFF Borrow App | `https://liff.line.me/2008626930-AddPwDy7` |
 | LIFF Dashboard | `https://liff.line.me/2008626930-pLAvndnp` |
 | GAS Endpoint | `https://script.google.com/macros/s/AKfycbybohIvFuZ7GZC7KVckrjb4mn1SFFT1wG-Z1Anabt02il3N05NweJNgsctcFedsi6QY/exec` |
 | Google Sheets | `https://docs.google.com/spreadsheets/d/19yL67pjWXKzhO6i-WYEQGaL2fi_ElHmdi7XiL1oCAIg` |
-| LIFF Repo (GitHub) | `https://github.com/Joe-Xuu/return-incentive-collection-system` |
-| Raspi Return Repo (private) | `https://github.com/Joe-Xuu/return-system` |
-| Raspi Return Repo (GitFront) | [`https://gitfront.io/r/joe-xuu/c8eP5yts7JdF/return-system/`](https://gitfront.io/r/joe-xuu/c8eP5yts7JdF/return-system/) |
+| Borrow LIFF Repo | `https://github.com/Joe-Xuu/return-liff-frontend` |
+| Dashboard LIFF Repo | `https://github.com/Joe-Xuu/return-incentive-collection-system` |
+| Raspi Station Repo (private) | `https://github.com/Joe-Xuu/return-system` |
+| Raspi Station (GitFront) | [`https://gitfront.io/r/joe-xuu/c8eP5yts7JdF/return-system/`](https://gitfront.io/r/joe-xuu/c8eP5yts7JdF/return-system/) |
+| Landscape (this doc) | `https://github.com/Joe-Xuu/return-system-landscape` |
