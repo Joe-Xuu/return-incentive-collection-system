@@ -328,6 +328,74 @@ img {
   margin-top: 2px;
 }
 
+/* Dimension 2: counter row */
+.eco-counter-row {
+  display: flex;
+  align-items: center;
+  background: var(--light-green);
+  border-radius: 14px;
+  padding: 14px 0;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-green);
+}
+
+.eco-counter-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.eco-counter-value {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.1;
+}
+
+.eco-counter-green {
+  color: var(--main-green);
+}
+
+.eco-counter-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  text-align: center;
+  padding: 0 8px;
+}
+
+.eco-counter-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-green);
+}
+
+/* Lifecycle progress */
+.eco-cycle-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.eco-cycle-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.eco-cycle-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--main-green);
+  font-family: 'Montserrat', sans-serif;
+}
+
 .eco-bar-wrap {
   background: var(--border-light);
   border-radius: 99px;
@@ -345,7 +413,7 @@ img {
 }
 
 .eco-caption {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   font-weight: 600;
   text-align: center;

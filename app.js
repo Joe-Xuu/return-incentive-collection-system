@@ -7,7 +7,8 @@ const LIFF_ID = "2008626930-pLAvndnp";
 const GAS_ENDPOINT =
   "https://script.google.com/macros/s/AKfycbybohIvFuZ7GZC7KVckrjb4mn1SFFT1wG-Z1Anabt02il3N05NweJNgsctcFedsi6QY/exec";
 
-const CO2_PER_USE = 94; // grams saved per container use
+const CO2_PER_USE = 33;   // g CO2 saved per use vs. single-use paper container (Megloo LCA)
+const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
 // --- DOM References --------------------------------------
 const $ = (sel) => document.querySelector(sel);
@@ -83,55 +84,68 @@ function finishLoading() {
 }
 
 // --- Eco Impact ------------------------------------------
-// Piecewise materialization matching the thesis design:
-//   < 3,000g  → plastic bags  (~30g CO2 each)
-//   < 63,000g → car-km        (~0.21 kg CO2/km → 210g/km)
-//   >=63,000g → Tokyo-Osaka flights (~77,000g CO2 each)
+// Based on Megloo LCA data (supervised by Earth & Human Environment Forum / Univ. of Tokyo):
+//   - Megloo PP container (265g), assumed 100 reuse cycles → 2.65g CO2/use
+//   - Single-use paper container (36g) → 36g CO2/use
+//   - Saving per use vs. paper: ~33g CO2 (≈90% reduction)
+//
+// Piecewise CO2 metaphor tiers:
+//   < 1,000g  → single-use containers avoided (1 container = 36g)
+//   < 21,000g → plastic bags (~30g CO2 each)
+//   >=21,000g → car-km (~210g CO2/km)
 
 function computeEcoMetaphor(totalCo2g) {
-  if (totalCo2g < 3000) {
+  if (totalCo2g < 1000) {
+    const containers = Math.round(totalCo2g / 36);
+    return { icon: "📦", value: `≈ ${containers}`, label: "single-use containers worth of CO₂" };
+  } else if (totalCo2g < 21000) {
     const bags = Math.round(totalCo2g / 30);
-    return { icon: "🛍️", value: `≈ ${bags}`, label: "plastic bags avoided" };
-  } else if (totalCo2g < 63000) {
+    return { icon: "🛍️", value: `≈ ${bags}`, label: "plastic bags worth of CO₂" };
+  } else {
     const km = (totalCo2g / 210).toFixed(1);
     return { icon: "🚗", value: `≈ ${km} km`, label: "equivalent car journey avoided" };
-  } else {
-    const flights = (totalCo2g / 77000).toFixed(2);
-    return { icon: "✈️", value: `≈ ${flights}`, label: "Tokyo–Osaka flights worth of CO₂" };
   }
 }
 
 function renderEcoImpact(usageCount) {
   const totalCo2g = usageCount * CO2_PER_USE;
 
-  // stat box
-  if (totalCo2g >= 1000) {
-    statCo2.textContent = (totalCo2g / 1000).toFixed(2) + "kg";
-  } else {
-    statCo2.textContent = totalCo2g + "g";
-  }
+  // ── Stat box: CO2 saved ──
+  const co2Str = totalCo2g >= 1000
+    ? (totalCo2g / 1000).toFixed(2) + "kg"
+    : totalCo2g + "g";
+  if (statCo2) statCo2.textContent = co2Str;
+  const statCo2Inline = document.getElementById("stat-co2-inline");
+  if (statCo2Inline) statCo2Inline.textContent = co2Str;
 
-  // metaphor card
+  // ── Dimension 1: CO2 metaphor ──
   const m = computeEcoMetaphor(totalCo2g);
   ecoIcon.textContent  = m.icon;
   ecoValue.textContent = m.value;
   ecoLabel.textContent = m.label;
 
-  // progress bar — visualise within current tier
-  let pct = 0;
-  if (totalCo2g < 3000) {
-    pct = Math.min((totalCo2g / 3000) * 100, 100);
-  } else if (totalCo2g < 63000) {
-    pct = Math.min(((totalCo2g - 3000) / 60000) * 100, 100);
-  } else {
-    pct = Math.min(((totalCo2g - 63000) / 77000) * 100, 100);
-  }
-  // trigger CSS transition after a short delay
+  // ── Dimension 2: containers avoided counter ──
+  const containersAvoided = document.getElementById("eco-containers-count");
+  if (containersAvoided) containersAvoided.textContent = usageCount;
+
+  // ── Lifecycle progress bar: progress toward 100-use full cycle ──
+  const cycleProgress = usageCount % MEGLOO_LIFECYCLE;
+  const cycleNum      = Math.floor(usageCount / MEGLOO_LIFECYCLE);
+  const pct           = (cycleProgress / MEGLOO_LIFECYCLE) * 100;
   setTimeout(() => { ecoBar.style.width = pct + "%"; }, 100);
 
-  ecoCaption.textContent = `Total CO₂ saved: ${totalCo2g >= 1000
-    ? (totalCo2g / 1000).toFixed(2) + " kg"
-    : totalCo2g + " g"} · Each container saves ~94g`;
+  const cycleEl = document.getElementById("eco-cycle-label");
+  if (cycleEl) {
+    if (cycleNum > 0) {
+      cycleEl.textContent = `Cycle ${cycleNum + 1} · ${cycleProgress}/${MEGLOO_LIFECYCLE} uses`;
+    } else {
+      cycleEl.textContent = `${cycleProgress}/${MEGLOO_LIFECYCLE} uses toward full lifecycle`;
+    }
+  }
+
+  // ── Caption ──
+  ecoCaption.textContent =
+    `vs. single-use paper container · 90% CO₂ reduction per use · Megloo LCA data`;
 }
 
 // --- Data Fetching ---------------------------------------

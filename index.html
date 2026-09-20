@@ -72,17 +72,38 @@
         <div class="card-header">
           <h3 class="card-title">🌍 Your Environmental Impact</h3>
         </div>
+
+        <!-- Dimension 1: CO2 metaphor -->
         <div class="eco-metaphor-row">
-          <div class="eco-metaphor-icon" id="eco-icon">🛍️</div>
+          <div class="eco-metaphor-icon" id="eco-icon">📦</div>
           <div class="eco-metaphor-text">
             <div class="eco-metaphor-value" id="eco-value">—</div>
-            <div class="eco-metaphor-label" id="eco-label">equivalent plastic bags avoided</div>
+            <div class="eco-metaphor-label" id="eco-label">—</div>
           </div>
+        </div>
+
+        <!-- Dimension 2: containers avoided -->
+        <div class="eco-counter-row">
+          <div class="eco-counter-block">
+            <span class="eco-counter-value" id="eco-containers-count">0</span>
+            <span class="eco-counter-label">single-use containers avoided</span>
+          </div>
+          <div class="eco-counter-divider"></div>
+          <div class="eco-counter-block">
+            <span class="eco-counter-value eco-counter-green" id="stat-co2-inline">—</span>
+            <span class="eco-counter-label">CO₂ saved</span>
+          </div>
+        </div>
+
+        <!-- Lifecycle progress bar -->
+        <div class="eco-cycle-header">
+          <span class="eco-cycle-title">♻️ Container Lifecycle</span>
+          <span class="eco-cycle-label" id="eco-cycle-label">0/100 uses</span>
         </div>
         <div class="eco-bar-wrap">
           <div class="eco-bar" id="eco-bar"></div>
         </div>
-        <p class="eco-caption" id="eco-caption">Each container saves ~94g of CO₂.</p>
+        <p class="eco-caption" id="eco-caption">vs. single-use paper container · Megloo LCA data</p>
       </section>
 
       <!-- Borrowing Status Card -->
