@@ -8,14 +8,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Re:Turn — Dashboard</title>
 
-  <!-- Google Fonts: Montserrat -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 
-  <!-- LINE LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
 <body>
@@ -34,59 +32,122 @@
       <div class="header-brand">
         <h1 class="brand-title">Re:Turn</h1>
       </div>
-      <span class="header-subtitle">Dashboard</span>
+      <span class="header-subtitle" id="header-tab-label">Dashboard</span>
     </header>
 
-    <!-- Profile Card -->
-    <section class="card profile-card">
-      <div class="profile-top">
-        <div class="avatar-wrapper">
-          <img id="profile-pic" class="avatar" src="" alt="User avatar" />
-        </div>
-        <div class="profile-info">
-          <h2 id="user-name" class="user-name">—</h2>
-          <span id="user-id" class="user-id">—</span>
-        </div>
-      </div>
-      <div class="stats-row">
-        <div class="stat-item">
-          <span class="stat-value" id="stat-score">0</span>
-          <span class="stat-label">Points</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-usage">0</span>
-          <span class="stat-label">Total Uses</span>
-        </div>
-      </div>
-    </section>
+    <!-- ===== TAB: PROFILE (default) ===== -->
+    <div id="tab-profile" class="tab-panel">
 
-    <!-- Borrowing Status Card -->
-    <section class="card borrow-card">
-      <div class="card-header">
-        <h3 class="card-title">Current Borrowing</h3>
-      </div>
-      <div id="borrow-content">
-        <!-- Dynamically filled -->
-      </div>
-    </section>
+      <!-- Profile Card -->
+      <section class="card profile-card">
+        <div class="profile-top">
+          <div class="avatar-wrapper">
+            <img id="profile-pic" class="avatar" src="" alt="User avatar" />
+          </div>
+          <div class="profile-info">
+            <h2 id="user-name" class="user-name">—</h2>
+            <span id="user-id" class="user-id">—</span>
+          </div>
+        </div>
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-score">0</span>
+            <span class="stat-label">Points</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-usage">0</span>
+            <span class="stat-label">Uses</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-co2">0g</span>
+            <span class="stat-label">CO₂ Saved</span>
+          </div>
+        </div>
+      </section>
 
-    <!-- Task Center: Intensive Collection (Placeholder) -->
-    <section class="card task-card">
-      <div class="card-header task-card-header">
-        <h3 class="card-title">🎯 Task Center: Intensive Collection</h3>
-        <span class="badge badge-coming-soon">Coming Soon</span>
-      </div>
-      <div class="task-placeholder">
-        <div class="placeholder-icon">🗺️</div>
-        <p class="placeholder-text">
-          Map view and lock-acquire logic<br />will be implemented here.
-        </p>
-      </div>
-    </section>
+      <!-- Eco Impact Card -->
+      <section class="card eco-card">
+        <div class="card-header">
+          <h3 class="card-title">🌍 Your Environmental Impact</h3>
+        </div>
+        <div class="eco-metaphor-row">
+          <div class="eco-metaphor-icon" id="eco-icon">🛍️</div>
+          <div class="eco-metaphor-text">
+            <div class="eco-metaphor-value" id="eco-value">—</div>
+            <div class="eco-metaphor-label" id="eco-label">equivalent plastic bags avoided</div>
+          </div>
+        </div>
+        <div class="eco-bar-wrap">
+          <div class="eco-bar" id="eco-bar"></div>
+        </div>
+        <p class="eco-caption" id="eco-caption">Each container saves ~94g of CO₂.</p>
+      </section>
+
+      <!-- Borrowing Status Card -->
+      <section class="card borrow-card">
+        <div class="card-header">
+          <h3 class="card-title">Current Borrowing</h3>
+        </div>
+        <div id="borrow-content">
+          <!-- Dynamically filled -->
+        </div>
+      </section>
+
+    </div><!-- /tab-profile -->
+
+    <!-- ===== TAB: LEADERBOARD ===== -->
+    <div id="tab-leaderboard" class="tab-panel hidden">
+
+      <section class="card leaderboard-card">
+        <div class="card-header">
+          <h3 class="card-title">🏆 SFC Leaderboard</h3>
+          <button class="btn-refresh" id="btn-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
+        </div>
+        <div id="leaderboard-content">
+          <div class="lb-loading">Loading rankings…</div>
+        </div>
+      </section>
+
+    </div><!-- /tab-leaderboard -->
+
+    <!-- ===== TAB: MAP ===== -->
+    <div id="tab-map" class="tab-panel hidden">
+
+      <section class="card task-card">
+        <div class="card-header task-card-header">
+          <h3 class="card-title">🎯 Task Center: Intensive Collection</h3>
+          <span class="badge badge-coming-soon">Coming Soon</span>
+        </div>
+        <div class="task-placeholder">
+          <div class="placeholder-icon">🗺️</div>
+          <p class="placeholder-text">
+            Map view and lock-acquire logic<br />will be implemented here.
+          </p>
+        </div>
+      </section>
+
+    </div><!-- /tab-map -->
 
   </main>
 
-  <script src="app.js?v=4"></script>
+  <!-- ========== Bottom Tab Bar ========== -->
+  <nav class="tab-bar" id="tab-bar">
+    <button class="tab-btn active" data-tab="profile" onclick="switchTab('profile')">
+      <span class="tab-icon">👤</span>
+      <span class="tab-label">Profile</span>
+    </button>
+    <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">
+      <span class="tab-icon">🏆</span>
+      <span class="tab-label">Ranking</span>
+    </button>
+    <button class="tab-btn" data-tab="map" onclick="switchTab('map')">
+      <span class="tab-icon">🗺️</span>
+      <span class="tab-label">Map</span>
+    </button>
+  </nav>
+
+  <script src="app.js?v=5"></script>
 </body>
 </html>
