@@ -67,6 +67,17 @@
         </div>
       </section>
 
+      <!-- Borrowing Status Card -->
+      <section class="card borrow-card">
+        <div class="card-header">
+          <h3 class="card-title">Current Borrowing</h3>
+          <button class="btn-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
+        </div>
+        <div id="borrow-content">
+          <!-- Dynamically filled -->
+        </div>
+      </section>
+
       <!-- Eco Impact Card -->
       <section class="card eco-card">
         <div class="card-header">
@@ -104,17 +115,6 @@
           <div class="eco-bar" id="eco-bar"></div>
         </div>
         <p class="eco-caption" id="eco-caption">vs. single-use paper container · Megloo LCA data</p>
-      </section>
-
-      <!-- Borrowing Status Card -->
-      <section class="card borrow-card">
-        <div class="card-header">
-          <h3 class="card-title">Current Borrowing</h3>
-          <button class="btn-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
-        </div>
-        <div id="borrow-content">
-          <!-- Dynamically filled -->
-        </div>
       </section>
 
     </div><!-- /tab-profile -->
