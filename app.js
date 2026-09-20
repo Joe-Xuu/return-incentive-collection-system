@@ -10,6 +10,10 @@ const GAS_ENDPOINT =
 const CO2_PER_USE = 33;   // g CO2 saved per use vs. single-use paper container (Megloo LCA)
 const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
+// --- Module-level state ----------------------------------
+let _currentUserId   = null;
+let _currentUserName = null;
+
 // --- DOM References --------------------------------------
 const $ = (sel) => document.querySelector(sel);
 
@@ -220,7 +224,16 @@ function renderBorrowing(items) {
   borrowContent.innerHTML = `<div class="borrow-list">${listHtml}</div>`;
 }
 
-let leaderboardLoaded = false;
+async function refreshBorrowing() {
+  if (!_currentUserId) return;
+  borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Refreshing…</p></div>`;
+  try {
+    const response = await fetchDashboardData(_currentUserId, _currentUserName);
+    renderBorrowing(response.data.borrowedItems);
+  } catch (err) {
+    borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Failed to refresh. Try again.</p></div>`;
+  }
+}
 
 async function loadLeaderboard() {
   lbContent.innerHTML = `<div class="lb-loading">Loading rankings…</div>`;
@@ -262,6 +275,8 @@ async function initApp() {
   const liffProfile = await liff.getProfile();
   const userId      = liffProfile.userId;
   const displayName = liffProfile.displayName || "";
+  _currentUserId   = userId;
+  _currentUserName = displayName;
   userIdEl.textContent = `ID: ${userId.slice(0, 12)}…`;
 
   const response = await fetchDashboardData(userId, displayName);
