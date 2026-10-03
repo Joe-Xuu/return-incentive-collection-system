@@ -100,13 +100,13 @@ function finishLoading() {
 function computeEcoMetaphor(totalCo2g) {
   if (totalCo2g < 1000) {
     const containers = Math.round(totalCo2g / 36);
-    return { icon: "📦", value: `≈ ${containers}`, label: "single-use containers worth of CO₂" };
+    return { icon: "◻", value: `≈ ${containers}`, label: "single-use containers worth of CO₂" };
   } else if (totalCo2g < 21000) {
     const bags = Math.round(totalCo2g / 30);
-    return { icon: "🛍️", value: `≈ ${bags}`, label: "plastic bags worth of CO₂" };
+    return { icon: "◻", value: `≈ ${bags}`, label: "plastic bags worth of CO₂" };
   } else {
     const km = (totalCo2g / 210).toFixed(1);
-    return { icon: "🚗", value: `≈ ${km} km`, label: "equivalent car journey avoided" };
+    return { icon: "→", value: `≈ ${km} km`, label: "equivalent car journey avoided" };
   }
 }
 
@@ -160,7 +160,14 @@ async function fetchDashboardData(userId, userName) {
     userName: userName || "ECO PLAYER",
   }).toString();
 
-  const res  = await fetch(url);
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  let res;
+  try {
+    res = await fetch(url, { signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
   const text = await res.text();
   const json = JSON.parse(text);
 
@@ -214,7 +221,7 @@ function renderBorrowing(items) {
   if (!items || items.length === 0) {
     borrowContent.innerHTML = `
       <div class="borrow-empty">
-        <div class="borrow-empty-icon">✅</div>
+        <div class="borrow-empty-icon">✓</div>
         <p class="borrow-empty-text">All cleared! You have no unreturned containers.</p>
       </div>`;
     return;
@@ -240,7 +247,10 @@ async function refreshBorrowing() {
     renderProfile(response.data, null);
     renderBorrowing(response.data.borrowedItems);
   } catch (err) {
-    borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Failed to refresh. Try again.</p></div>`;
+    const msg = err.name === "AbortError"
+      ? "Server took too long. Try again."
+      : "Failed to refresh. Try again.";
+    borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${msg}</p></div>`;
   }
 }
 
@@ -260,14 +270,14 @@ async function loadLeaderboard() {
 
     const rows = board.map((u) => `
       <div class="lb-item">
-        <span class="lb-rank">${u.rank <= 3 ? ["🥇","🥈","🥉"][u.rank - 1] : u.rank}</span>
+        <span class="lb-rank">${u.rank <= 3 ? ["#1","#2","#3"][u.rank - 1] : u.rank}</span>
         <span class="lb-name">${escapeHtml(u.name)}</span>
         <span class="lb-score">${u.score}<span class="lb-score-label">uses</span></span>
       </div>`).join("");
 
     lbContent.innerHTML = `
       <div class="lb-list">${rows}</div>
-      <p class="lb-total">Campus total: ${totalUses.toLocaleString()} container uses 🌍</p>`;
+      <p class="lb-total">Campus total: ${totalUses.toLocaleString()} container uses</p>`;
 
     leaderboardLoaded = true;
   } catch (err) {
