@@ -231,7 +231,7 @@ function renderBorrowing(items) {
 
 async function refreshBorrowing() {
   if (!_currentUserId) return;
-  borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Refreshing…</p></div>`;
+  borrowContent.innerHTML = `<div class="inline-loading"><div class="inline-spinner"></div></div>`;
   try {
     const response = await fetchDashboardData(_currentUserId, _currentUserName);
     renderProfile(response.data, null);
@@ -245,7 +245,7 @@ async function refreshBorrowing() {
 }
 
 async function loadLeaderboard() {
-  lbContent.innerHTML = `<div class="lb-loading">Loading rankings…</div>`;
+  lbContent.innerHTML = `<div class="inline-loading"><div class="inline-spinner"></div></div>`;
   try {
     const json = await fetchLeaderboard();
     if (json.status !== "success") throw new Error(json.message || "Failed");

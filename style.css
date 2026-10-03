@@ -162,10 +162,22 @@ img {
   color: var(--text-muted);
   transition: color 0.2s;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .tab-btn.active {
   color: var(--main-green);
+}
+
+.tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--main-green);
+  border-radius: 2px 2px 0 0;
 }
 
 .tab-icon {
@@ -617,4 +629,20 @@ img {
   #app {
     padding: 32px 0 calc(var(--tab-bar-h) + 32px);
   }
+}
+
+/* --- Inline Spinner (borrow / leaderboard loading) ------ */
+.inline-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+}
+
+.inline-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--main-green);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
 }
