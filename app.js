@@ -167,6 +167,15 @@ async function fetchDashboardData(userId, userName) {
   if (!res.ok || json.status !== "success") {
     throw new Error(json.message || "HTTP " + res.status);
   }
+
+  // Cache the result for next open
+  try {
+    localStorage.setItem(
+      `return_dashboard_${userId}`,
+      JSON.stringify({ data: json.data, cachedAt: Date.now() })
+    );
+  } catch (_) {}
+
   return json;
 }
 
@@ -228,6 +237,7 @@ async function refreshBorrowing() {
   borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Refreshing…</p></div>`;
   try {
     const response = await fetchDashboardData(_currentUserId, _currentUserName);
+    renderProfile(response.data, null);
     renderBorrowing(response.data.borrowedItems);
   } catch (err) {
     borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">Failed to refresh. Try again.</p></div>`;
@@ -278,12 +288,33 @@ async function initApp() {
   _currentUserName = displayName;
   userIdEl.textContent = `ID: ${userId.slice(0, 12)}…`;
 
-  const response = await fetchDashboardData(userId, displayName);
-  const data     = response.data;
+  // 1. Render immediately from cache if available
+  const cacheKey = `return_dashboard_${userId}`;
+  const cached   = localStorage.getItem(cacheKey);
+  if (cached) {
+    try {
+      const { data } = JSON.parse(cached);
+      renderProfile(data, liffProfile);
+      renderBorrowing(data.borrowedItems);
+      finishLoading();
+      // Silently refresh in background
+      fetchDashboardData(userId, displayName)
+        .then((response) => {
+          renderProfile(response.data, liffProfile);
+          renderBorrowing(response.data.borrowedItems);
+        })
+        .catch(() => {}); // silent — user already sees cached data
+      return;
+    } catch (_) {}
+  }
 
-  renderProfile(data, liffProfile);
-  renderBorrowing(data.borrowedItems);
+  // 2. No cache: show UI immediately with LIFF profile, lazy-load GAS data
+  renderProfile(
+    { userName: displayName, usageCount: 0, borrowedItems: [] },
+    liffProfile
+  );
   finishLoading();
+  // borrowing section stays as "Tap Refresh to load"
 }
 
 // --- Boot ------------------------------------------------
