@@ -7,7 +7,7 @@ const LIFF_ID = "2008626930-pLAvndnp";
 const GAS_ENDPOINT =
   "https://script.google.com/macros/s/AKfycbybohIvFuZ7GZC7KVckrjb4mn1SFFT1wG-Z1Anabt02il3N05NweJNgsctcFedsi6QY/exec";
 
-const CO2_PER_USE = 33;   // g CO2 saved per use vs. single-use paper container (Megloo LCA)
+const CO2_PER_USE = 36;   // g CO2 per use = 1 single-use paper container avoided (Megloo LCA, 36g/container)
 const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
 // --- Module-level state ----------------------------------
@@ -89,9 +89,8 @@ function finishLoading() {
 
 // --- Eco Impact ------------------------------------------
 // Based on Megloo LCA data (supervised by Earth & Human Environment Forum / Univ. of Tokyo):
-//   - Megloo PP container (265g), assumed 100 reuse cycles → 2.65g CO2/use
 //   - Single-use paper container (36g) → 36g CO2/use
-//   - Saving per use vs. paper: ~33g CO2 (≈90% reduction)
+//   - Each Megloo use = 1 paper container avoided = 36g CO2 saved
 //
 // Piecewise CO2 metaphor tiers:
 //   < 1,000g  → single-use containers avoided (1 container = 36g)
@@ -149,7 +148,7 @@ function renderEcoImpact(usageCount) {
 
   // ── Caption ──
   ecoCaption.textContent =
-    `vs. single-use paper container · 90% CO₂ reduction per use · Megloo LCA data`;
+    `= ${usageCount} single-use paper container(s) avoided · Megloo LCA data (36g CO₂/container)`;
 }
 
 // --- Data Fetching ---------------------------------------

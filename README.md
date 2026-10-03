@@ -91,7 +91,7 @@ return-liff-frontend/
 | Splash | Green fullscreen "Re:Turn" + welcome message, 1.8s fade-out |
 | Borrow View | Container ID display + "はい" button |
 | GAS Call | `POST borrow` with `userId` + `containerId` |
-| Success View | CO2 counter animation (94g/container), eco metaphor text |
+| Success View | CO2 counter animation (36g/borrow, cumulative; = 1 paper container avoided, Megloo LCA), eco metaphor text |
 | Leaderboard | Dark card with slam-in animation + confetti + shake effect |
 | Name Edit | 8-char uppercase modal, saves to localStorage + GAS `updateName` |
 | LIFF Auth | Full LIFF init → ID token → login flow; localhost bypass for dev |
@@ -187,7 +187,7 @@ NFC Tag → return_core.py (MFRC522)
 **Architecture detail — two-process design:**
 - `return_core.py` runs as a **bare-metal NFC daemon** (no Flask dependency). It scans tags every 20ms with hardware gain maxed to 48dB. On scan: fires a 0.5s timeout POST to local Flask (for instant UI feedback), then spawns a daemon thread for the slow GAS HTTP call.
 - `app.py` runs as a **Flask + SSE server** on port 5000. The SSE `/api/stream` endpoint keeps a persistent connection to the browser. When `/api/trigger` receives a containerId, it pushes it to all connected SSE clients immediately — the browser shows a checkmark animation with <200ms latency from tag tap.
-- After the animation, the browser fetches fresh leaderboard data from GAS `getStats`. CO2 is calculated as `totalBorrows × 94g / 1000` with animated counter + eco metaphor text.
+- After the animation, the browser fetches fresh leaderboard data from GAS `getStats`. CO2 is calculated as `totalBorrows × 36g / 1000` (= paper containers avoided, Megloo LCA) with animated counter + eco metaphor text.
 
 **Station UI (templates/index.html):**
 - Left panel: "Re:Turn" branding + NFC radar pulse animation + "容器をタッチしてください"
