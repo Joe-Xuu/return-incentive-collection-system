@@ -26,7 +26,6 @@ const statScore      = $("#stat-score");
 const statUsage      = $("#stat-usage");
 const statCo2        = $("#stat-co2");
 const borrowContent  = $("#borrow-content");
-const ecoIcon        = $("#eco-icon");
 const ecoValue       = $("#eco-value");
 const ecoLabel       = $("#eco-label");
 const ecoBar         = $("#eco-bar");
@@ -118,20 +117,13 @@ function renderEcoImpact(usageCount) {
     ? (totalCo2g / 1000).toFixed(2) + "kg"
     : totalCo2g + "g";
   if (statCo2) statCo2.textContent = co2Str;
-  const statCo2Inline = document.getElementById("stat-co2-inline");
-  if (statCo2Inline) statCo2Inline.textContent = co2Str;
 
-  // ── Dimension 1: CO2 metaphor ──
+  // ── CO2 metaphor ──
   const m = computeEcoMetaphor(totalCo2g);
-  ecoIcon.textContent  = m.icon;
   ecoValue.textContent = m.value;
   ecoLabel.textContent = m.label;
 
-  // ── Dimension 2: containers avoided counter ──
-  const containersAvoided = document.getElementById("eco-containers-count");
-  if (containersAvoided) containersAvoided.textContent = usageCount;
-
-  // ── Lifecycle progress bar: progress toward 100-use full cycle ──
+  // ── Lifecycle progress bar ──
   const cycleProgress = usageCount % MEGLOO_LIFECYCLE;
   const cycleNum      = Math.floor(usageCount / MEGLOO_LIFECYCLE);
   const pct           = (cycleProgress / MEGLOO_LIFECYCLE) * 100;
@@ -139,16 +131,13 @@ function renderEcoImpact(usageCount) {
 
   const cycleEl = document.getElementById("eco-cycle-label");
   if (cycleEl) {
-    if (cycleNum > 0) {
-      cycleEl.textContent = `Cycle ${cycleNum + 1} · ${cycleProgress}/${MEGLOO_LIFECYCLE} uses`;
-    } else {
-      cycleEl.textContent = `${cycleProgress}/${MEGLOO_LIFECYCLE} uses toward full lifecycle`;
-    }
+    cycleEl.textContent = cycleNum > 0
+      ? `Cycle ${cycleNum + 1} · ${cycleProgress}/${MEGLOO_LIFECYCLE} uses`
+      : `${cycleProgress}/${MEGLOO_LIFECYCLE} uses`;
   }
 
   // ── Caption ──
-  ecoCaption.textContent =
-    `= ${usageCount} single-use paper container(s) avoided · Megloo LCA data (36g CO₂/container)`;
+  ecoCaption.textContent = "Megloo LCA data · 36g CO₂ per container";
 }
 
 // --- Data Fetching ---------------------------------------
@@ -196,17 +185,18 @@ async function fetchLeaderboard() {
 // --- Rendering -------------------------------------------
 
 function renderProfile(data, liffProfile) {
-  const picUrl =
-    (liffProfile && liffProfile.pictureUrl) ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      data.userName
-    )}&background=06c755&color=fff&size=128`;
-
-  profilePic.src = picUrl;
-  profilePic.onerror = () => {
-    profilePic.src =
-      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23d4fcdc'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='40' fill='%2306c755'%3E%E2%98%BB%3C/text%3E%3C/svg%3E";
-  };
+  if (liffProfile) {
+    const picUrl =
+      liffProfile.pictureUrl ||
+      `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        data.userName
+      )}&background=06c755&color=fff&size=128`;
+    profilePic.src = picUrl;
+    profilePic.onerror = () => {
+      profilePic.src =
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23d4fcdc'/%3E%3Ctext x='50' y='65' text-anchor='middle' font-size='40' fill='%2306c755'%3E%E2%98%BB%3C/text%3E%3C/svg%3E";
+    };
+  }
 
   userNameEl.textContent = data.userName;
   const uses   = data.usageCount || 0;
