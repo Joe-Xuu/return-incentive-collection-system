@@ -120,16 +120,22 @@
     <!-- ===== TAB: MAP ===== -->
     <div id="tab-map" class="tab-panel hidden">
 
-      <section class="card task-card">
-        <div class="card-header task-card-header">
-          <h3 class="card-title">Task Center: Intensive Collection</h3>
-          <span class="badge badge-coming-soon">Coming Soon</span>
+      <!-- ── Map / Photo section ──────────────────────────────
+           Place return-spot images here.
+           Recommended: one <img> per location, wrapped in .map-photo-item.
+           Example:
+             <div class="map-photo-item">
+               <img src="images/spot-a.jpg" alt="Spot A — Building X 1F" />
+               <p class="map-photo-caption">Building X · 1F Entrance</p>
+             </div>
+           ─────────────────────────────────────────────────── -->
+      <section class="card map-card">
+        <div class="card-header">
+          <h3 class="card-title">Return Spots</h3>
         </div>
-        <div class="task-placeholder">
-          <div class="placeholder-icon">+</div>
-          <p class="placeholder-text">
-            Map view and lock-acquire logic<br />will be implemented here.
-          </p>
+        <div class="map-photo-grid" id="map-photo-grid">
+          <!-- TODO: add photo cards here -->
+          <p class="map-placeholder-text">Photos coming soon.</p>
         </div>
       </section>
 
@@ -152,15 +158,24 @@
   <!-- ========== Bottom Tab Bar ========== -->
   <nav class="tab-bar" id="tab-bar">
     <button class="tab-btn active" data-tab="profile" onclick="switchTab('profile')">
-      <span class="tab-icon">👤</span>
+      <span class="tab-icon">
+        <!-- Lucide: user -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      </span>
       <span class="tab-label">Profile</span>
     </button>
     <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">
-      <span class="tab-icon">🏆</span>
+      <span class="tab-icon">
+        <!-- Lucide: bar-chart-2 -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      </span>
       <span class="tab-label">Ranking</span>
     </button>
     <button class="tab-btn" data-tab="map" onclick="switchTab('map')">
-      <span class="tab-icon">🗺️</span>
+      <span class="tab-icon">
+        <!-- Lucide: map-pin -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-4-7-7.8-7-11a7 7 0 0 1 14 0c0 3.2-3 7-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      </span>
       <span class="tab-label">Map</span>
     </button>
   </nav>
