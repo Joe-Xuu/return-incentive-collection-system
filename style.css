@@ -253,6 +253,29 @@ img {
   min-width: 0;
 }
 
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-edit-name {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  padding: 2px 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s;
+}
+
+.btn-edit-name:hover {
+  color: var(--main-green);
+}
+
 .user-name {
   font-size: 1.25rem;
   font-weight: 900;

@@ -10,6 +10,49 @@ const GAS_ENDPOINT =
 const CO2_PER_USE = 36;   // g CO2 per use = 1 single-use paper container avoided (Megloo LCA, 36g/container)
 const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
+// --- i18n strings (EN only for now; JA to be added) ------
+const STRINGS = {
+  en: {
+    tabProfile:     "Dashboard",
+    tabRanking:     "Ranking",
+    tabMap:         "Map",
+    points:         "Points",
+    uses:           "Uses",
+    co2Saved:       "CO₂ Saved",
+    currentBorrow:  "Current Borrowing",
+    refresh:        "↻ Refresh",
+    allCleared:     "All cleared! You have no unreturned containers.",
+    tapRefresh:     "Tap Refresh to load.",
+    refreshing:     "Refreshing…",
+    failedTimeout:  "Server took too long. Try again.",
+    failedRefresh:  "Failed to refresh. Try again.",
+    ecoTitle:       "Environmental Impact",
+    cycleLabel:     (n, total) => `${n}/${total} uses until a full life cycle`,
+    cycleNum:       (cycle, n, total) => `Cycle ${cycle} · ${n}/${total} uses until a full life cycle`,
+    ecoCaption:     "Megloo LCA data · 36g CO₂ per container",
+    leaderboard:    "SFC Leaderboard",
+    lbLoading:      "Loading rankings…",
+    lbFailed:       "Failed to load. Tap ↻ to retry.",
+    lbNoData:       "No data yet.",
+    lbTotal:        (n) => `Campus total: ${n} container uses`,
+    taskCenter:     "Task Center: Intensive Collection",
+    comingSoon:     "Coming Soon",
+    mapPlaceholder: "Map view and lock-acquire logic\nwill be implemented here.",
+    editNamePrompt: "Enter your display name:",
+    editNameSaving: "Saving…",
+    editNameDone:   "Name updated!",
+    editNameFailed: "Failed to update. Try again.",
+    borrowing:      "Borrowing",
+    borrowed:       "Borrowed:",
+  }
+};
+
+let _lang = "en";
+const T = (key, ...args) => {
+  const val = STRINGS[_lang][key];
+  return typeof val === "function" ? val(...args) : val;
+};
+
 // --- Module-level state ----------------------------------
 let _currentUserId   = null;
 let _currentUserName = null;
@@ -227,6 +270,58 @@ function renderBorrowing(items) {
     </div>`).join("");
 
   borrowContent.innerHTML = `<div class="borrow-list">${listHtml}</div>`;
+}
+
+async function updateName(userId, newName) {
+  const url = GAS_ENDPOINT + "?" + new URLSearchParams({
+    action: "updateName",
+    userId: userId,
+    userName: newName,
+  }).toString();
+  // updateName is a POST in GAS but we call via GET-compatible doGet fallback;
+  // use POST to be safe
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const res = await fetch(GAS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "updateName", userId, userName: newName }),
+      signal: controller.signal,
+    });
+    const json = await res.json();
+    if (json.status !== "success") throw new Error(json.message || "failed");
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function promptEditName() {
+  if (!_currentUserId) return;
+  const current = userNameEl.textContent || "";
+  const input = prompt(T("editNamePrompt"), current === "—" ? "" : current);
+  if (input === null) return; // cancelled
+  const trimmed = input.trim();
+  if (!trimmed || trimmed === current) return;
+
+  userNameEl.textContent = trimmed;
+  _currentUserName = trimmed;
+
+  updateName(_currentUserId, trimmed)
+    .then(() => {
+      // update localStorage cache
+      try {
+        const raw = localStorage.getItem(`return_dashboard_${_currentUserId}`);
+        if (raw) {
+          const cached = JSON.parse(raw);
+          cached.data.userName = trimmed;
+          localStorage.setItem(`return_dashboard_${_currentUserId}`, JSON.stringify(cached));
+        }
+      } catch (_) {}
+    })
+    .catch(() => {
+      // silent — name already updated in UI optimistically
+    });
 }
 
 async function refreshBorrowing() {
