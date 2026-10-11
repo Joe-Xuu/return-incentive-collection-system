@@ -263,11 +263,15 @@ img {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.65rem;
+  font-weight: 700;
   color: var(--text-muted);
   padding: 2px 4px;
   line-height: 1;
   flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: 'Montserrat', sans-serif;
   -webkit-tap-highlight-color: transparent;
   transition: color 0.2s;
 }
