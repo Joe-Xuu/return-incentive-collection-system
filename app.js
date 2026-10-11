@@ -38,7 +38,7 @@ const STRINGS = {
     taskCenter:     "Task Center: Intensive Collection",
     comingSoon:     "Coming Soon",
     mapPlaceholder: "Map view and lock-acquire logic\nwill be implemented here.",
-    editNamePrompt: "Enter your display name:",
+    editNamePrompt: "Enter your name:",
     editNameSaving: "Saving…",
     editNameDone:   "Name updated!",
     editNameFailed: "Failed to update. Try again.",
@@ -298,30 +298,49 @@ async function updateName(userId, newName) {
 
 function promptEditName() {
   if (!_currentUserId) return;
+  const overlay = document.getElementById("edit-name-overlay");
+  const input   = document.getElementById("edit-name-input");
   const current = userNameEl.textContent || "";
-  const input = prompt(T("editNamePrompt"), current === "—" ? "" : current);
-  if (input === null) return; // cancelled
-  const trimmed = input.trim();
-  if (!trimmed || trimmed === current) return;
+  input.value = current === "—" ? "" : current;
+  overlay.classList.remove("hidden");
+  requestAnimationFrame(() => overlay.classList.add("visible"));
+  setTimeout(() => input.focus(), 250);
+}
 
-  userNameEl.textContent = trimmed;
-  _currentUserName = trimmed;
+function closeEditModal() {
+  const overlay = document.getElementById("edit-name-overlay");
+  overlay.classList.remove("visible");
+  setTimeout(() => overlay.classList.add("hidden"), 200);
+}
 
-  updateName(_currentUserId, trimmed)
-    .then(() => {
-      // update localStorage cache
-      try {
-        const raw = localStorage.getItem(`return_dashboard_${_currentUserId}`);
-        if (raw) {
-          const cached = JSON.parse(raw);
-          cached.data.userName = trimmed;
-          localStorage.setItem(`return_dashboard_${_currentUserId}`, JSON.stringify(cached));
-        }
-      } catch (_) {}
-    })
-    .catch(() => {
-      // silent — name already updated in UI optimistically
-    });
+async function confirmEditName() {
+  const input  = document.getElementById("edit-name-input");
+  const btn    = document.querySelector(".modal-btn-confirm");
+  const trimmed = input.value.trim();
+  if (!trimmed) return;
+
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+
+  try {
+    await updateName(_currentUserId, trimmed);
+    userNameEl.textContent = trimmed;
+    _currentUserName = trimmed;
+    try {
+      const raw = localStorage.getItem(`return_dashboard_${_currentUserId}`);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        cached.data.userName = trimmed;
+        localStorage.setItem(`return_dashboard_${_currentUserId}`, JSON.stringify(cached));
+      }
+    } catch (_) {}
+    closeEditModal();
+  } catch {
+    btn.textContent = "Failed. Retry";
+  } finally {
+    btn.disabled = false;
+    if (btn.textContent === "Saving…") btn.textContent = "Save";
+  }
 }
 
 async function refreshBorrowing() {

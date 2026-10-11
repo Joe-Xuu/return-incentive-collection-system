@@ -673,3 +673,114 @@ img {
   border-radius: 50%;
   animation: spin 0.75s linear infinite;
 }
+
+/* --- Edit Name Modal ------------------------------------ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(240, 253, 244, 0.92);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.modal-overlay.visible {
+  opacity: 1;
+}
+
+.modal-card {
+  background: var(--panel-bg);
+  border-radius: 20px;
+  padding: 28px 24px;
+  width: 100%;
+  max-width: 360px;
+  box-shadow: 0 20px 60px rgba(6, 199, 85, 0.15);
+  border: 1px solid var(--border-green);
+  transform: translateY(16px);
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.modal-overlay.visible .modal-card {
+  transform: translateY(0);
+}
+
+.modal-title {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  letter-spacing: 0.02em;
+}
+
+.modal-input {
+  width: 100%;
+  border: 2px solid var(--border-green);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-main);
+  background: var(--light-green);
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 18px;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus {
+  border-color: var(--main-green);
+  background: #fff;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-color);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.03em;
+  transition: background 0.2s;
+}
+
+.modal-btn-cancel:hover {
+  background: var(--border-light);
+}
+
+.modal-btn-confirm {
+  flex: 2;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: var(--main-green);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: #fff;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  letter-spacing: 0.04em;
+  transition: opacity 0.2s;
+}
+
+.modal-btn-confirm:hover {
+  opacity: 0.88;
+}
+
+.modal-btn-confirm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

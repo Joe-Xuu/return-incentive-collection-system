@@ -137,6 +137,18 @@
 
   </main>
 
+  <!-- ========== Edit Name Modal ========== -->
+  <div id="edit-name-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeEditModal()">
+    <div class="modal-card">
+      <h3 class="modal-title">Edit Display Name</h3>
+      <input id="edit-name-input" class="modal-input" type="text" maxlength="20" placeholder="Your name" />
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="modal-btn-confirm" onclick="confirmEditName()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ========== Bottom Tab Bar ========== -->
   <nav class="tab-bar" id="tab-bar">
     <button class="tab-btn active" data-tab="profile" onclick="switchTab('profile')">
