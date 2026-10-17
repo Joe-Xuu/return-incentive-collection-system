@@ -10,41 +10,78 @@ const GAS_ENDPOINT =
 const CO2_PER_USE = 36;   // g CO2 per use = 1 single-use paper container avoided (Megloo LCA, 36g/container)
 const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
-// --- i18n strings (EN only for now; JA to be added) ------
+// --- i18n strings ----------------------------------------
 const STRINGS = {
   en: {
-    tabProfile:     "Dashboard",
-    tabRanking:     "Ranking",
-    tabMap:         "Map",
-    points:         "Points",
-    uses:           "Uses",
-    co2Saved:       "CO₂ Saved",
-    currentBorrow:  "Current Borrowing",
-    refresh:        "↻ Refresh",
-    allCleared:     "All cleared! You have no unreturned containers.",
-    tapRefresh:     "Tap Refresh to load.",
-    refreshing:     "Refreshing…",
-    failedTimeout:  "Server took too long. Try again.",
-    failedRefresh:  "Failed to refresh. Try again.",
-    ecoTitle:       "Environmental Impact",
-    cycleLabel:     (n, total) => `${n}/${total} uses until a full life cycle`,
-    cycleNum:       (cycle, n, total) => `Cycle ${cycle} · ${n}/${total} uses until a full life cycle`,
-    ecoCaption:     "Megloo LCA data · 36g CO₂ per container",
-    leaderboard:    "SFC Leaderboard",
-    lbLoading:      "Loading rankings…",
-    lbFailed:       "Failed to load. Tap ↻ to retry.",
-    lbNoData:       "No data yet.",
-    lbTotal:        (n) => `Campus total: ${n} container uses`,
-    taskCenter:     "Task Center: Intensive Collection",
-    comingSoon:     "Coming Soon",
-    mapPlaceholder: "Map view and lock-acquire logic\nwill be implemented here.",
-    editNamePrompt: "Enter your name:",
-    editNameSaving: "Saving…",
-    editNameDone:   "Name updated!",
-    editNameFailed: "Failed to update. Try again.",
-    borrowing:      "Borrowing",
-    borrowed:       "Borrowed:",
-  }
+    tabProfile:      "Dashboard",
+    tabRanking:      "Ranking",
+    tabMap:          "Map",
+    points:          "Points",
+    uses:            "Uses",
+    co2Saved:        "CO₂ Saved",
+    currentBorrow:   "Current Borrowing",
+    refresh:         "↻ Refresh",
+    allCleared:      "All cleared! You have no unreturned containers.",
+    tapRefresh:      "Tap ↻ Refresh to load your borrowing status.",
+    refreshing:      "Refreshing…",
+    failedTimeout:   "Server is starting up — please refresh again in a moment.",
+    failedRefresh:   "Failed to refresh. Try again.",
+    ecoTitle:        "Environmental Impact",
+    cycleLabel:      (n, total) => `${n}/${total} uses until a full life cycle`,
+    cycleNum:        (cycle, n, total) => `Cycle ${cycle} · ${n}/${total} uses until a full life cycle`,
+    ecoCaption:      "Megloo LCA data · 36g CO₂ per container",
+    leaderboard:     "SFC Leaderboard",
+    lbLoading:       "Loading rankings…",
+    lbFailed:        "Failed to load. Tap ↻ to retry.",
+    lbNoData:        "No data yet.",
+    lbTotal:         (n) => `Campus total: ${n} container uses`,
+    mapTitle:        "Return Spots",
+    mapPlaceholder:  "Photos coming soon.",
+    editNamePrompt:  "Enter your name:",
+    editNameTitle:   "Edit Display Name",
+    editNameSave:    "Save",
+    editNameCancel:  "Cancel",
+    editNameSaving:  "Saving…",
+    editNameFailed:  "Failed. Retry",
+    borrowing:       "Borrowing",
+    borrowed:        "Borrowed:",
+    langToggle:      "日本語",
+  },
+  ja: {
+    tabProfile:      "ダッシュボード",
+    tabRanking:      "ランキング",
+    tabMap:          "返却場所",
+    points:          "ポイント",
+    uses:            "利用回数",
+    co2Saved:        "CO₂削減量",
+    currentBorrow:   "現在の借出",
+    refresh:         "↻ 更新",
+    allCleared:      "未返却の容器はありません。",
+    tapRefresh:      "↻ 更新 を押して借出状況を確認してください。",
+    refreshing:      "読み込み中…",
+    failedTimeout:   "サーバー起動中です。もう一度更新してください。",
+    failedRefresh:   "更新に失敗しました。もう一度お試しください。",
+    ecoTitle:        "環境への貢献",
+    cycleLabel:      (n, total) => `ライフサイクルまで ${n}/${total} 回`,
+    cycleNum:        (cycle, n, total) => `サイクル ${cycle} · ${n}/${total} 回`,
+    ecoCaption:      "Megloo LCAデータ · 容器1回あたり36g CO₂",
+    leaderboard:     "SFCランキング",
+    lbLoading:       "ランキング読み込み中…",
+    lbFailed:        "読み込み失敗。↻ を押して再試行。",
+    lbNoData:        "データがありません。",
+    lbTotal:         (n) => `キャンパス合計: ${n} 回利用`,
+    mapTitle:        "返却場所",
+    mapPlaceholder:  "写真は近日公開予定です。",
+    editNamePrompt:  "表示名を入力してください：",
+    editNameTitle:   "表示名を変更",
+    editNameSave:    "保存",
+    editNameCancel:  "キャンセル",
+    editNameSaving:  "保存中…",
+    editNameFailed:  "失敗しました。再試行",
+    borrowing:       "借出中",
+    borrowed:        "借出日時:",
+    langToggle:      "English",
+  },
 };
 
 let _lang = "en";
@@ -52,6 +89,59 @@ const T = (key, ...args) => {
   const val = STRINGS[_lang][key];
   return typeof val === "function" ? val(...args) : val;
 };
+
+function switchLang() {
+  _lang = _lang === "en" ? "ja" : "en";
+  // update toggle button label
+  document.getElementById("lang-toggle").textContent = T("langToggle");
+  // re-render all static UI text
+  applyStrings();
+  // re-render dynamic content
+  if (borrowContent) {
+    const isEmpty = borrowContent.querySelector(".borrow-empty");
+    if (isEmpty) {
+      borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${T("tapRefresh")}</p></div>`;
+    }
+  }
+  if (lbContent) {
+    const isIdle = lbContent.querySelector(".lb-loading");
+    if (isIdle) lbContent.innerHTML = `<div class="lb-loading">${T("lbLoading")}</div>`;
+  }
+}
+
+function applyStrings() {
+  // header tab label
+  const activeTab = document.querySelector(".tab-btn.active");
+  if (activeTab) {
+    const tab = activeTab.dataset.tab;
+    const labels = { profile: T("tabProfile"), leaderboard: T("tabRanking"), map: T("tabMap") };
+    if (headerLabel) headerLabel.textContent = labels[tab] || tab;
+  }
+  // tab labels
+  document.querySelectorAll(".tab-btn").forEach(btn => {
+    const tab = btn.dataset.tab;
+    const labelEl = btn.querySelector(".tab-label");
+    if (labelEl) {
+      const labels = { profile: T("tabProfile"), leaderboard: T("tabRanking"), map: T("tabMap") };
+      labelEl.textContent = labels[tab] || tab;
+    }
+  });
+  // static card titles & labels
+  const set = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = T(key); };
+  set("borrow-card-title",  "currentBorrow");
+  set("btn-borrow-refresh", "refresh");
+  set("eco-card-title",     "ecoTitle");
+  set("lb-card-title",      "leaderboard");
+  set("btn-lb-refresh",     "refresh");
+  set("map-card-title",     "mapTitle");
+  set("stat-label-points",  "points");
+  set("stat-label-uses",    "uses");
+  set("stat-label-co2",     "co2Saved");
+  // modal
+  set("modal-title-edit",   "editNameTitle");
+  set("modal-btn-save",     "editNameSave");
+  set("modal-btn-cancel",   "editNameCancel");
+}
 
 // --- Module-level state ----------------------------------
 let _currentUserId   = null;
@@ -78,12 +168,6 @@ const headerLabel    = $("#header-tab-label");
 
 // --- Tab Switching ---------------------------------------
 
-const TAB_LABELS = {
-  profile:     "Dashboard",
-  leaderboard: "Ranking",
-  map:         "Map",
-};
-
 function switchTab(name) {
   // hide all panels
   document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("hidden"));
@@ -96,7 +180,8 @@ function switchTab(name) {
   document.querySelector(`.tab-btn[data-tab="${name}"]`).classList.add("active");
 
   // update header label
-  headerLabel.textContent = TAB_LABELS[name] || name;
+  const labels = { profile: T("tabProfile"), leaderboard: T("tabRanking"), map: T("tabMap") };
+  headerLabel.textContent = labels[name] || name;
 
   // lazy-load leaderboard on first visit
   if (name === "leaderboard") {
@@ -175,12 +260,12 @@ function renderEcoImpact(usageCount) {
   const cycleEl = document.getElementById("eco-cycle-label");
   if (cycleEl) {
     cycleEl.textContent = cycleNum > 0
-      ? `Cycle ${cycleNum + 1} · ${cycleProgress}/${MEGLOO_LIFECYCLE} uses`
-      : `${cycleProgress}/${MEGLOO_LIFECYCLE} uses`;
+      ? T("cycleNum", cycleNum + 1, cycleProgress, MEGLOO_LIFECYCLE)
+      : T("cycleLabel", cycleProgress, MEGLOO_LIFECYCLE);
   }
 
   // ── Caption ──
-  ecoCaption.textContent = "Megloo LCA data · 36g CO₂ per container";
+  ecoCaption.textContent = T("ecoCaption");
 }
 
 // --- Data Fetching ---------------------------------------
@@ -255,7 +340,7 @@ function renderBorrowing(items) {
     borrowContent.innerHTML = `
       <div class="borrow-empty">
         <div class="borrow-empty-icon">✓</div>
-        <p class="borrow-empty-text">All cleared! You have no unreturned containers.</p>
+        <p class="borrow-empty-text">${T("allCleared")}</p>
       </div>`;
     return;
   }
@@ -264,9 +349,9 @@ function renderBorrowing(items) {
     <div class="borrow-item">
       <div class="borrow-item-left">
         <span class="borrow-container-id">${escapeHtml(item.containerId)}</span>
-        <span class="borrow-time">Borrowed: ${formatTime(item.borrowTime)}</span>
+        <span class="borrow-time">${T("borrowed")} ${formatTime(item.borrowTime)}</span>
       </div>
-      <span class="borrow-badge">Borrowing</span>
+      <span class="borrow-badge">${T("borrowing")}</span>
     </div>`).join("");
 
   borrowContent.innerHTML = `<div class="borrow-list">${listHtml}</div>`;
@@ -320,7 +405,7 @@ async function confirmEditName() {
   if (!trimmed) return;
 
   btn.disabled = true;
-  btn.textContent = "Saving…";
+  btn.textContent = T("editNameSaving");
 
   try {
     await updateName(_currentUserId, trimmed);
@@ -336,10 +421,10 @@ async function confirmEditName() {
     } catch (_) {}
     closeEditModal();
   } catch {
-    btn.textContent = "Failed. Retry";
+    btn.textContent = T("editNameFailed");
   } finally {
     btn.disabled = false;
-    if (btn.textContent === "Saving…") btn.textContent = "Save";
+    if (btn.textContent === T("editNameSaving")) btn.textContent = T("editNameSave");
   }
 }
 
@@ -351,9 +436,7 @@ async function refreshBorrowing() {
     renderProfile(response.data, null);
     renderBorrowing(response.data.borrowedItems);
   } catch (err) {
-    const msg = err.name === "AbortError"
-      ? "Server took too long. Try again."
-      : "Failed to refresh. Try again.";
+    const msg = err.name === "AbortError" ? T("failedTimeout") : T("failedRefresh");
     borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${msg}</p></div>`;
   }
 }
@@ -368,7 +451,7 @@ async function loadLeaderboard() {
     const totalUses  = json.totalBorrows || 0;
 
     if (board.length === 0) {
-      lbContent.innerHTML = `<div class="lb-loading">No data yet.</div>`;
+      lbContent.innerHTML = `<div class="lb-loading">${T("lbNoData")}</div>`;
       return;
     }
 
@@ -381,11 +464,11 @@ async function loadLeaderboard() {
 
     lbContent.innerHTML = `
       <div class="lb-list">${rows}</div>
-      <p class="lb-total">Campus total: ${totalUses.toLocaleString()} container uses</p>`;
+      <p class="lb-total">${T("lbTotal", totalUses.toLocaleString())}</p>`;
 
     leaderboardLoaded = true;
   } catch (err) {
-    lbContent.innerHTML = `<div class="lb-loading">Failed to load. Tap ↻ to retry.</div>`;
+    lbContent.innerHTML = `<div class="lb-loading">${T("lbFailed")}</div>`;
     console.error("[Re:Turn leaderboard]", err);
   }
 }
@@ -411,6 +494,7 @@ async function initApp() {
       renderProfile(data, liffProfile);
       renderBorrowing(data.borrowedItems);
       finishLoading();
+      applyStrings();
       // Silently refresh in background
       fetchDashboardData(userId, displayName)
         .then((response) => {
@@ -429,6 +513,8 @@ async function initApp() {
   );
   finishLoading();
   // borrowing section stays as "Tap Refresh to load"
+  borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${T("tapRefresh")}</p></div>`;
+  applyStrings();
 }
 
 // --- Boot ------------------------------------------------

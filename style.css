@@ -95,6 +95,7 @@ img {
 .app-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 10px 0 18px;
   border-bottom: 2px solid var(--main-green);
   margin-bottom: 24px;
@@ -124,6 +125,27 @@ img {
   letter-spacing: 0.08em;
   line-height: 1;
   padding-bottom: 2px;
+}
+
+.btn-lang-toggle {
+  background: none;
+  border: 1px solid var(--border-green);
+  border-radius: 99px;
+  padding: 5px 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  transition: color 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-lang-toggle:hover {
+  color: var(--main-green);
+  border-color: var(--main-green);
 }
 
 /* --- Tab Panels ----------------------------------------- */

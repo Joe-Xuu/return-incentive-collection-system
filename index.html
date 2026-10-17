@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=5">
+  <link rel="stylesheet" href="style.css?v=6">
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
@@ -30,6 +30,7 @@
         <h1 class="brand-title">Re:Turn</h1>
         <span class="header-subtitle" id="header-tab-label">Dashboard</span>
       </div>
+      <button id="lang-toggle" class="btn-lang-toggle" onclick="switchLang()">日本語</button>
     </header>
 
     <!-- ===== TAB: PROFILE (default) ===== -->
@@ -52,17 +53,17 @@
         <div class="stats-row">
           <div class="stat-item">
             <span class="stat-value" id="stat-score">0</span>
-            <span class="stat-label">Points</span>
+            <span class="stat-label" id="stat-label-points">Points</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-value" id="stat-usage">0</span>
-            <span class="stat-label">Uses</span>
+            <span class="stat-label" id="stat-label-uses">Uses</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-value" id="stat-co2">0g</span>
-            <span class="stat-label">CO₂ Saved</span>
+            <span class="stat-label" id="stat-label-co2">CO₂ Saved</span>
           </div>
         </div>
       </section>
@@ -70,8 +71,8 @@
       <!-- Borrowing Status Card -->
       <section class="card borrow-card">
         <div class="card-header">
-          <h3 class="card-title">Current Borrowing</h3>
-          <button class="btn-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
+          <h3 class="card-title" id="borrow-card-title">Current Borrowing</h3>
+          <button class="btn-refresh" id="btn-borrow-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
         </div>
         <div id="borrow-content">
           <div class="borrow-empty">
@@ -83,7 +84,7 @@
       <!-- Eco Impact Card -->
       <section class="card eco-card">
         <div class="card-header">
-          <h3 class="card-title">Environmental Impact</h3>
+          <h3 class="card-title" id="eco-card-title">Environmental Impact</h3>
         </div>
 
         <!-- Big number + label -->
@@ -107,8 +108,8 @@
 
       <section class="card leaderboard-card">
         <div class="card-header">
-          <h3 class="card-title">SFC Leaderboard</h3>
-          <button class="btn-refresh" id="btn-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
+          <h3 class="card-title" id="lb-card-title">SFC Leaderboard</h3>
+          <button class="btn-refresh" id="btn-lb-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
         </div>
         <div id="leaderboard-content">
           <div class="lb-loading">Loading rankings…</div>
@@ -131,7 +132,7 @@
            ─────────────────────────────────────────────────── -->
       <section class="card map-card">
         <div class="card-header">
-          <h3 class="card-title">Return Spots</h3>
+          <h3 class="card-title" id="map-card-title">Return Spots</h3>
         </div>
         <div class="map-photo-grid" id="map-photo-grid">
           <!-- TODO: add photo cards here -->
@@ -146,11 +147,11 @@
   <!-- ========== Edit Name Modal ========== -->
   <div id="edit-name-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeEditModal()">
     <div class="modal-card">
-      <h3 class="modal-title">Edit Display Name</h3>
+      <h3 class="modal-title" id="modal-title-edit">Edit Display Name</h3>
       <input id="edit-name-input" class="modal-input" type="text" maxlength="20" placeholder="Your name" />
       <div class="modal-actions">
-        <button class="modal-btn-cancel" onclick="closeEditModal()">Cancel</button>
-        <button class="modal-btn-confirm" onclick="confirmEditName()">Save</button>
+        <button class="modal-btn-cancel" id="modal-btn-cancel" onclick="closeEditModal()">Cancel</button>
+        <button class="modal-btn-confirm" id="modal-btn-save" onclick="confirmEditName()">Save</button>
       </div>
     </div>
   </div>
@@ -180,6 +181,6 @@
     </button>
   </nav>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
