@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;900&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=7">
 
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
@@ -28,7 +28,7 @@
     <header class="app-header">
       <div class="header-brand">
         <h1 class="brand-title">Re:Turn</h1>
-        <span class="header-subtitle" id="header-tab-label">Dashboard</span>
+        <span class="header-subtitle" id="header-tab-label">ダッシュボード</span>
       </div>
       <button id="lang-toggle" class="btn-lang-toggle" onclick="switchLang()">English</button>
     </header>
@@ -53,12 +53,12 @@
         <div class="stats-row">
           <div class="stat-item">
             <span class="stat-value" id="stat-usage">0</span>
-            <span class="stat-label" id="stat-label-uses">Uses</span>
+            <span class="stat-label" id="stat-label-uses">利用回数</span>
           </div>
           <div class="stat-divider"></div>
           <div class="stat-item">
             <span class="stat-value" id="stat-co2">0g</span>
-            <span class="stat-label" id="stat-label-co2">CO₂ Saved</span>
+            <span class="stat-label" id="stat-label-co2">CO₂削減量</span>
           </div>
         </div>
       </section>
@@ -66,12 +66,12 @@
       <!-- Borrowing Status Card -->
       <section class="card borrow-card">
         <div class="card-header">
-          <h3 class="card-title" id="borrow-card-title">Current Borrowing</h3>
+          <h3 class="card-title" id="borrow-card-title">現在の借出</h3>
         </div>
         <div id="borrow-content">
           <div class="borrow-empty">
-            <p class="borrow-empty-text">Tap Refresh to load.</p>
-            <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
+            <p class="borrow-empty-text">↻ 更新 を押して借出状況を確認してください。</p>
+            <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">↻ 更新</button>
           </div>
         </div>
       </section>
@@ -79,7 +79,7 @@
       <!-- Eco Impact Card -->
       <section class="card eco-card">
         <div class="card-header">
-          <h3 class="card-title" id="eco-card-title">Environmental Impact</h3>
+          <h3 class="card-title" id="eco-card-title">環境への貢献</h3>
         </div>
 
         <!-- Big number + label -->
@@ -103,11 +103,11 @@
 
       <section class="card leaderboard-card">
         <div class="card-header">
-          <h3 class="card-title" id="lb-card-title">SFC Leaderboard</h3>
-          <button class="btn-refresh" id="btn-lb-refresh" onclick="loadLeaderboard()">↻ Refresh</button>
+          <h3 class="card-title" id="lb-card-title">SFCランキング</h3>
+          <button class="btn-refresh" id="btn-lb-refresh" onclick="loadLeaderboard()">↻ 更新</button>
         </div>
         <div id="leaderboard-content">
-          <div class="lb-loading">Loading rankings…</div>
+          <div class="lb-loading">ランキング読み込み中…</div>
         </div>
       </section>
 
@@ -127,11 +127,11 @@
            ─────────────────────────────────────────────────── -->
       <section class="card map-card">
         <div class="card-header">
-          <h3 class="card-title" id="map-card-title">Return Spots</h3>
+          <h3 class="card-title" id="map-card-title">返却場所</h3>
         </div>
         <div class="map-photo-grid" id="map-photo-grid">
           <!-- TODO: add photo cards here -->
-          <p class="map-placeholder-text">Photos coming soon.</p>
+          <p class="map-placeholder-text">写真は近日公開予定です。</p>
         </div>
       </section>
 
@@ -142,11 +142,11 @@
   <!-- ========== Edit Name Modal ========== -->
   <div id="edit-name-overlay" class="modal-overlay hidden" onclick="if(event.target===this)closeEditModal()">
     <div class="modal-card">
-      <h3 class="modal-title" id="modal-title-edit">Edit Display Name</h3>
-      <input id="edit-name-input" class="modal-input" type="text" maxlength="20" placeholder="Your name" />
+      <h3 class="modal-title" id="modal-title-edit">表示名を変更</h3>
+      <input id="edit-name-input" class="modal-input" type="text" maxlength="20" placeholder="表示名" />
       <div class="modal-actions">
-        <button class="modal-btn-cancel" id="modal-btn-cancel" onclick="closeEditModal()">Cancel</button>
-        <button class="modal-btn-confirm" id="modal-btn-save" onclick="confirmEditName()">Save</button>
+        <button class="modal-btn-cancel" id="modal-btn-cancel" onclick="closeEditModal()">キャンセル</button>
+        <button class="modal-btn-confirm" id="modal-btn-save" onclick="confirmEditName()">保存</button>
       </div>
     </div>
   </div>
@@ -158,24 +158,24 @@
         <!-- Lucide: user -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       </span>
-      <span class="tab-label">Profile</span>
+      <span class="tab-label">ダッシュボード</span>
     </button>
     <button class="tab-btn" data-tab="leaderboard" onclick="switchTab('leaderboard')">
       <span class="tab-icon">
         <!-- Lucide: bar-chart-2 -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       </span>
-      <span class="tab-label">Ranking</span>
+      <span class="tab-label">ランキング</span>
     </button>
     <button class="tab-btn" data-tab="map" onclick="switchTab('map')">
       <span class="tab-icon">
         <!-- Lucide: map-pin -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4-4-7-7.8-7-11a7 7 0 0 1 14 0c0 3.2-3 7-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
       </span>
-      <span class="tab-label">Map</span>
+      <span class="tab-label">返却場所</span>
     </button>
   </nav>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>
