@@ -537,7 +537,7 @@ document.addEventListener("DOMContentLoaded", () => {
     borrowContent.innerHTML = `
       <div class="borrow-empty">
         <p class="borrow-empty-text">${T("failedRefresh")}</p>
-        <button class="btn-refresh btn-refresh-center" onclick="location.reload()">${T("refresh")}</button>
+        <button class="btn-refresh btn-refresh-center" onclick="refreshBorrowing()">${T("refresh")}</button>
       </div>`;
   });
 });
