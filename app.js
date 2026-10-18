@@ -84,7 +84,7 @@ const STRINGS = {
   },
 };
 
-let _lang = "en";
+let _lang = "ja";
 const T = (key, ...args) => {
   const val = STRINGS[_lang][key];
   return typeof val === "function" ? val(...args) : val;
