@@ -155,7 +155,6 @@ const appShell       = $("#app");
 const profilePic     = $("#profile-pic");
 const userNameEl     = $("#user-name");
 const userIdEl       = $("#user-id");
-const statScore      = $("#stat-score");
 const statUsage      = $("#stat-usage");
 const statCo2        = $("#stat-co2");
 const borrowContent  = $("#borrow-content");
@@ -328,8 +327,6 @@ function renderProfile(data, liffProfile) {
 
   userNameEl.textContent = data.userName;
   const uses   = data.usageCount || 0;
-  const points = uses * 10;
-  statScore.textContent = points.toLocaleString();
   statUsage.textContent = uses;
 
   renderEcoImpact(uses);
