@@ -529,17 +529,13 @@ async function initApp() {
 }
 
 // --- Boot ------------------------------------------------
-function bootApp() {
+document.addEventListener("DOMContentLoaded", () => {
   initApp().catch((err) => {
     console.error("[Re:Turn]", err.message || err);
     finishLoading();
-    applyStrings();
     borrowContent.innerHTML = `
       <div class="borrow-empty">
-        <p class="borrow-empty-text">${T("failedRefresh")}</p>
-        <button class="btn-refresh btn-refresh-center" onclick="bootApp()">${T("refresh")}</button>
+        <p class="borrow-empty-text">Failed to load. Please try again.</p>
       </div>`;
   });
-}
-
-document.addEventListener("DOMContentLoaded", bootApp);
+});
