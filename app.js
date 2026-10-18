@@ -84,7 +84,7 @@ const STRINGS = {
   },
 };
 
-let _lang = "en";
+let _lang = "ja";
 const T = (key, ...args) => {
   const val = STRINGS[_lang][key];
   return typeof val === "function" ? val(...args) : val;
@@ -100,7 +100,11 @@ function switchLang() {
   if (borrowContent) {
     const isEmpty = borrowContent.querySelector(".borrow-empty");
     if (isEmpty) {
-      borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${T("tapRefresh")}</p></div>`;
+      borrowContent.innerHTML = `
+        <div class="borrow-empty">
+          <p class="borrow-empty-text">${T("tapRefresh")}</p>
+          <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">${T("refresh")}</button>
+        </div>`;
     }
   }
   if (lbContent) {
@@ -129,10 +133,10 @@ function applyStrings() {
   // static card titles & labels
   const set = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = T(key); };
   set("borrow-card-title",  "currentBorrow");
-  set("btn-borrow-refresh", "refresh");
   set("eco-card-title",     "ecoTitle");
   set("lb-card-title",      "leaderboard");
   set("btn-lb-refresh",     "refresh");
+  set("btn-borrow-refresh", "refresh");
   set("map-card-title",     "mapTitle");
   set("stat-label-points",  "points");
   set("stat-label-uses",    "uses");
@@ -344,7 +348,6 @@ function renderBorrowing(items) {
       </div>`;
     return;
   }
-
   const listHtml = items.map((item) => `
     <div class="borrow-item">
       <div class="borrow-item-left">
@@ -437,7 +440,11 @@ async function refreshBorrowing() {
     renderBorrowing(response.data.borrowedItems);
   } catch (err) {
     const msg = err.name === "AbortError" ? T("failedTimeout") : T("failedRefresh");
-    borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${msg}</p></div>`;
+    borrowContent.innerHTML = `
+      <div class="borrow-empty">
+        <p class="borrow-empty-text">${msg}</p>
+        <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">${T("refresh")}</button>
+      </div>`;
   }
 }
 
@@ -512,8 +519,12 @@ async function initApp() {
     liffProfile
   );
   finishLoading();
-  // borrowing section stays as "Tap Refresh to load"
-  borrowContent.innerHTML = `<div class="borrow-empty"><p class="borrow-empty-text">${T("tapRefresh")}</p></div>`;
+  // borrowing section: show tap-refresh prompt with center button
+  borrowContent.innerHTML = `
+    <div class="borrow-empty">
+      <p class="borrow-empty-text">${T("tapRefresh")}</p>
+      <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">${T("refresh")}</button>
+    </div>`;
   applyStrings();
 }
 

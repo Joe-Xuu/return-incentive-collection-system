@@ -30,7 +30,7 @@
         <h1 class="brand-title">Re:Turn</h1>
         <span class="header-subtitle" id="header-tab-label">Dashboard</span>
       </div>
-      <button id="lang-toggle" class="btn-lang-toggle" onclick="switchLang()">日本語</button>
+      <button id="lang-toggle" class="btn-lang-toggle" onclick="switchLang()">English</button>
     </header>
 
     <!-- ===== TAB: PROFILE (default) ===== -->
@@ -52,11 +52,6 @@
         </div>
         <div class="stats-row">
           <div class="stat-item">
-            <span class="stat-value" id="stat-score">0</span>
-            <span class="stat-label" id="stat-label-points">Points</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat-item">
             <span class="stat-value" id="stat-usage">0</span>
             <span class="stat-label" id="stat-label-uses">Uses</span>
           </div>
@@ -72,11 +67,11 @@
       <section class="card borrow-card">
         <div class="card-header">
           <h3 class="card-title" id="borrow-card-title">Current Borrowing</h3>
-          <button class="btn-refresh" id="btn-borrow-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
         </div>
         <div id="borrow-content">
           <div class="borrow-empty">
             <p class="borrow-empty-text">Tap Refresh to load.</p>
+            <button class="btn-refresh btn-refresh-center" id="btn-borrow-refresh" onclick="refreshBorrowing()">↻ Refresh</button>
           </div>
         </div>
       </section>
