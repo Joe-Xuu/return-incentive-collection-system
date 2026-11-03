@@ -366,10 +366,56 @@ img {
   border: 1px solid var(--border-green);
 }
 
-/* Big number block */
+/* Two-stat row: CO2 + Plastic */
+.eco-stats-row {
+  display: flex;
+  align-items: center;
+  background: var(--light-green);
+  border-radius: 14px;
+  padding: 16px 0;
+  margin-bottom: 16px;
+}
+
+.eco-stat-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.eco-stat-value {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--main-green);
+  font-family: 'Montserrat', sans-serif;
+  line-height: 1.1;
+}
+
+.eco-stat-unit {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+.eco-stat-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.eco-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border-green);
+}
+
+/* Metaphor block */
 .eco-main {
   text-align: center;
-  padding: 12px 0 20px;
+  padding: 4px 0 16px;
 }
 
 .eco-metaphor-value {
@@ -381,10 +427,10 @@ img {
 }
 
 .eco-metaphor-label {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   color: var(--text-muted);
   font-weight: 600;
-  margin-top: 6px;
+  margin-top: 0;
 }
 
 /* Lifecycle progress */

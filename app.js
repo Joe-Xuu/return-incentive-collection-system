@@ -7,7 +7,8 @@ const LIFF_ID = "2008626930-pLAvndnp";
 const GAS_ENDPOINT =
   "https://script.google.com/macros/s/AKfycbybohIvFuZ7GZC7KVckrjb4mn1SFFT1wG-Z1Anabt02il3N05NweJNgsctcFedsi6QY/exec";
 
-const CO2_PER_USE = 36;   // g CO2 per use = 1 single-use paper container avoided (Megloo LCA, 36g/container)
+const CO2_PER_USE     = 139;  // g CO2 per use vs single-use plastic container (Megloo LCA)
+const PLASTIC_PER_USE = 20.6; // g plastic waste per use
 const MEGLOO_LIFECYCLE = 100; // assumed full reuse cycles per container
 
 // --- i18n strings ----------------------------------------
@@ -29,7 +30,9 @@ const STRINGS = {
     ecoTitle:        "Environmental Impact",
     cycleLabel:      (n, total) => `${n}/${total} uses until a full life cycle`,
     cycleNum:        (cycle, n, total) => `Cycle ${cycle} · ${n}/${total} uses until a full life cycle`,
-    ecoCaption:      "Megloo LCA data · 36g CO₂ per container",
+    ecoCaption:      "Megloo LCA · CO₂ 139g/use · Plastic 20.6g/use",
+    ecoLabelCo2:     "CO₂ Reduced",
+    ecoLabelPlastic: "Plastic Waste Reduced",
     leaderboard:     "SFC Leaderboard",
     lbLoading:       "Loading rankings…",
     lbFailed:        "Failed to load. Tap ↻ to retry.",
@@ -64,7 +67,9 @@ const STRINGS = {
     ecoTitle:        "環境への貢献",
     cycleLabel:      (n, total) => `ライフサイクルまで ${n}/${total} 回`,
     cycleNum:        (cycle, n, total) => `サイクル ${cycle} · ${n}/${total} 回`,
-    ecoCaption:      "Megloo LCAデータ · 容器1回あたり36g CO₂",
+    ecoCaption:      "Megloo LCA · CO₂ 139g/回・プラ 20.6g/回",
+    ecoLabelCo2:     "CO₂削減量",
+    ecoLabelPlastic: "プラごみ削減量",
     leaderboard:     "SFCランキング",
     lbLoading:       "ランキング読み込み中…",
     lbFailed:        "読み込み失敗。↻ を押して再試行。",
@@ -128,10 +133,12 @@ function applyStrings() {
   });
   // static card titles & labels
   const set = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = T(key); };
-  set("borrow-card-title",  "currentBorrow");
-  set("btn-borrow-refresh", "refresh");
-  set("eco-card-title",     "ecoTitle");
-  set("lb-card-title",      "leaderboard");
+  set("borrow-card-title",      "currentBorrow");
+  set("btn-borrow-refresh",     "refresh");
+  set("eco-card-title",         "ecoTitle");
+  set("eco-stat-label-co2",     "ecoLabelCo2");
+  set("eco-stat-label-plastic", "ecoLabelPlastic");
+  set("lb-card-title",          "leaderboard");
   set("btn-lb-refresh",     "refresh");
   set("map-card-title",     "mapTitle");
   set("stat-label-points",  "points");
@@ -214,41 +221,49 @@ function finishLoading() {
 }
 
 // --- Eco Impact ------------------------------------------
-// Based on Megloo LCA data (supervised by Earth & Human Environment Forum / Univ. of Tokyo):
-//   - Single-use paper container (36g) → 36g CO2/use
-//   - Each Megloo use = 1 paper container avoided = 36g CO2 saved
+// Based on Megloo LCA data:
+//   - CO2:     139g/use vs single-use plastic container (incl. washing/transport)
+//   - Plastic: 20.6g/use (weight of single-use container)
 //
-// Piecewise CO2 metaphor tiers:
-//   < 1,000g  → single-use containers avoided (1 container = 36g)
-//   < 21,000g → plastic bags (~30g CO2 each)
-//   >=21,000g → car-km (~210g CO2/km)
+// CO2 metaphor tiers (same as raspi display):
+//   < 10kg  → plastic bags (~30g each)
+//   < 50kg  → cedar trees (14kg/year absorption)
+//   < 300kg → car km (~130g/km)
+//   >=300kg → Tokyo-Osaka flights (~60kg/person)
 
-function computeEcoMetaphor(totalCo2g) {
-  if (totalCo2g < 1000) {
-    const containers = Math.round(totalCo2g / 36);
-    return { icon: "◻", value: `≈ ${containers}`, label: "single-use containers worth of CO₂" };
-  } else if (totalCo2g < 21000) {
-    const bags = Math.round(totalCo2g / 30);
-    return { icon: "◻", value: `≈ ${bags}`, label: "plastic bags worth of CO₂" };
+function computeEcoMetaphor(co2Kg) {
+  if (co2Kg < 10) {
+    const bags = Math.floor(co2Kg * 1000 / 30);
+    return `レジ袋 約 ${bags.toLocaleString()} 枚分を削減！`;
+  } else if (co2Kg < 50) {
+    const trees = (co2Kg / 14).toFixed(1);
+    return `杉の木 約 ${trees} 本の年間吸収量！`;
+  } else if (co2Kg < 300) {
+    const km = Math.floor(co2Kg * 1000 / 130);
+    return `車の走行 約 ${km.toLocaleString()} km分の排気ガス！`;
   } else {
-    const km = (totalCo2g / 210).toFixed(1);
-    return { icon: "→", value: `≈ ${km} km`, label: "equivalent car journey avoided" };
+    const flights = (co2Kg / 60).toFixed(1);
+    return `東京-大阪フライト 約 ${flights} 人分のCO₂！`;
   }
 }
 
 function renderEcoImpact(usageCount) {
-  const totalCo2g = usageCount * CO2_PER_USE;
+  const co2Kg     = (usageCount * CO2_PER_USE) / 1000;
+  const plasticKg = (usageCount * PLASTIC_PER_USE) / 1000;
 
   // ── Stat box: CO2 saved ──
-  const co2Str = totalCo2g >= 1000
-    ? (totalCo2g / 1000).toFixed(2) + "kg"
-    : totalCo2g + "g";
+  const co2Str = co2Kg.toFixed(2) + "kg";
   if (statCo2) statCo2.textContent = co2Str;
 
-  // ── CO2 metaphor ──
-  const m = computeEcoMetaphor(totalCo2g);
-  ecoValue.textContent = m.value;
-  ecoLabel.textContent = m.label;
+  // ── Two stat items: CO2 + Plastic ──
+  const co2El = document.getElementById("eco-co2-value");
+  const plasticEl = document.getElementById("eco-plastic-value");
+  if (co2El) co2El.textContent = co2Kg.toFixed(2);
+  if (plasticEl) plasticEl.textContent = plasticKg.toFixed(2);
+
+  // ── Metaphor ──
+  const ecoLabelEl = document.getElementById("eco-label");
+  if (ecoLabelEl) ecoLabelEl.textContent = computeEcoMetaphor(co2Kg);
 
   // ── Lifecycle progress bar ──
   const cycleProgress = usageCount % MEGLOO_LIFECYCLE;

@@ -82,9 +82,21 @@
           <h3 class="card-title" id="eco-card-title">環境への貢献</h3>
         </div>
 
-        <!-- Big number + label -->
+        <!-- Two stat rows: CO2 + Plastic -->
+        <div class="eco-stats-row">
+          <div class="eco-stat-item">
+            <div class="eco-stat-value"><span id="eco-co2-value">0.00</span><span class="eco-stat-unit">kg</span></div>
+            <div class="eco-stat-label" id="eco-stat-label-co2">CO₂削減量</div>
+          </div>
+          <div class="eco-stat-divider"></div>
+          <div class="eco-stat-item">
+            <div class="eco-stat-value"><span id="eco-plastic-value">0.00</span><span class="eco-stat-unit">kg</span></div>
+            <div class="eco-stat-label" id="eco-stat-label-plastic">プラごみ削減量</div>
+          </div>
+        </div>
+
+        <!-- Metaphor -->
         <div class="eco-main">
-          <div class="eco-metaphor-value" id="eco-value">—</div>
           <div class="eco-metaphor-label" id="eco-label">—</div>
         </div>
 
@@ -92,8 +104,8 @@
         <div class="eco-bar-wrap">
           <div class="eco-bar" id="eco-bar"></div>
         </div>
-        <p class="eco-cycle-label" id="eco-cycle-label">0/100 uses</p>
-        <p class="eco-caption" id="eco-caption">Megloo LCA data · 36g CO₂ per container</p>
+        <p class="eco-cycle-label" id="eco-cycle-label">0/100</p>
+        <p class="eco-caption" id="eco-caption">Megloo LCA · CO₂ 139g/回・プラ 20.6g/回</p>
       </section>
 
     </div><!-- /tab-profile -->
